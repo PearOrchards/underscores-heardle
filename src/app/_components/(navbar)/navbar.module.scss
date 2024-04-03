@@ -1,0 +1,38 @@
+.nav {
+	width: 100%;
+
+	position: absolute;
+	top: 0;
+	left: 0;
+
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+
+	padding: 1rem 20vw;
+	border-bottom: 1px solid white;
+}
+
+.left {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+
+	font-size: 2rem;
+}
+
+.right {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-end;
+}
+
+.fa {
+	font-size: 2rem;
+	margin: auto;
+	padding: 0 .5rem;
+}
+
+.center {
+	font-size: 2rem;
+}

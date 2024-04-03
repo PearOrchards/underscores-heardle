@@ -1,0 +1,34 @@
+.modal {
+	width: 40%;
+	margin: auto;
+	padding: 2rem;
+
+	background-color: var(--background-secondary);
+
+	& h2 {
+		text-align: center;
+	}
+
+	& p {
+		font-size: 1.5rem;
+		padding-bottom: .5rem;
+
+		& a {
+			color: var(--link);
+		}
+	}
+}
+
+.modal::backdrop {
+	background-color: rgba(0, 0, 10, 0.5);
+}
+
+.close {
+	position: absolute;
+	top: 0;
+	right: 0;
+
+	font-size: 2rem;
+	margin: .5rem;
+	padding: 0 .5rem;
+}
