@@ -7,15 +7,32 @@
 
 	& h2 {
 		text-align: center;
+		font-size: 3rem;
+	}
+
+	& h3 {
+		font-size: 2.5rem;
+		text-align: right;
 	}
 
 	& p {
 		font-size: 1.5rem;
-		padding-bottom: .5rem;
+		padding-bottom: 1rem;
 
-		& a {
-			color: var(--link);
+		width: fit-content;
+
+		& svg {
+			margin-right: .5rem;
+			height: 2rem;
+			width: 2rem;
 		}
+
+		& a { color: var(--link); }
+	}
+
+	& div {
+		margin: auto;
+		width: fit-content;
 	}
 }
 
