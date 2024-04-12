@@ -26,7 +26,7 @@ export default function Navbar() {
 				<FontAwesomeIcon icon={faCircleInfo} className={styles.fa} onClick={openAboutModal} />
 				<Dialog isOpen={showAboutModal} onClose={closeAboutModal} >
 					<h2>about</h2>
-					<p>A recreation of Heardle for underscores, with all songs taken from the tracker (beyond skin purifying treatment).</p>
+					<p>A recreation of Heardle for underscores, with all songs taken from the tracker (mostly beyond skin purifying treatment).</p>
 					<p>Built by <Link href="https://www.orchards.dev">Pear</Link>, for the <Link href="https://www.youtube.com/playlist?list=PLAEc0HKmIWO-oDNPLi1aL1aazsqdxYhPg">daily underscores heardle series</Link>.</p>
 					<p>Also please check out the <Link href="https://heardle.apictureof.me/">original underscores heardle</Link> by shelly, it contains only soundcloud releases for those who want a fairer chance</p>
 				</Dialog>
