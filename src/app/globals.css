@@ -5,7 +5,8 @@
 		"Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
 		"Fira Mono", "Droid Sans Mono", "Courier New", monospace;
 
-	--foreground: #eeeeee;
+	--foreground: #eee;
+	--foreground-secondary: #999;
 	--background: #121212;
 	--background-secondary: #1e1e1e;
 	--button: #363636;

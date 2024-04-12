@@ -1,0 +1,18 @@
+.attemptBox {
+	width: 40vw;
+	height: 3rem;
+
+	margin: 1rem auto;
+	padding: .5rem;
+
+	border: 2px solid var(--foreground-secondary);
+
+	& p {
+		font-size: 1.5rem;
+	}
+}
+
+.active {
+	background-color: var(--background-secondary);
+	border-color: var(--foreground);
+}
