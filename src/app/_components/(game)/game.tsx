@@ -4,7 +4,7 @@ import styles from "./game.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useState, useEffect } from "react";
-import AttemptBox from "@/app/_components/(attemptBox)/attemptBox";
+import AttemptBox from "./(attemptBox)/attemptBox";
 
 export default function Game() {
 	const [currentAttempt, setCurrentAttempt] = useState<number>(0);
@@ -26,6 +26,9 @@ export default function Game() {
 				{[0, 1, 2, 3, 4, 5].map((i) => {
 					return <AttemptBox key={i} parentActive={ currentAttempt == i } parentGuess={""} />
 				})}
+			</div>
+			<div className={styles.bottom}>
+			
 			</div>
 		</>
 	)
