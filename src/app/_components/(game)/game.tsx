@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { useState, useEffect } from "react";
 import AttemptBox from "./(attemptBox)/attemptBox";
+import Player from "@/app/_components/(game)/(player)/player";
 
 export default function Game() {
 	const [currentAttempt, setCurrentAttempt] = useState<number>(0);
@@ -28,8 +29,9 @@ export default function Game() {
 				})}
 			</div>
 			<div className={styles.bottom}>
-			
+				<Player parentGuess={ currentAttempt } />
 			</div>
+			<button onClick={() => setCurrentAttempt(currentAttempt + 1)}>increment</button>
 		</>
 	)
 }

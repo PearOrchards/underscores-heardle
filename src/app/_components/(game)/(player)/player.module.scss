@@ -1,0 +1,86 @@
+.track {
+	width: 100%;
+	height: 1.5rem;
+
+	border-width: 2px 0;
+	border-style: solid;
+	border-color: var(--foreground-secondary);
+}
+
+.innerTrack {
+	width: 60vw;
+	height: 100%;
+	display: grid;
+	margin: 0 auto;
+
+	grid-template-columns: 1fr 1fr 2fr 4fr 8fr 16fr;
+}
+
+.block {
+	height: 100%;
+	border-right: 2px solid var(--foreground-secondary);
+
+	&:first-child {
+		border-left: 2px solid var(--foreground-secondary);
+	}
+}
+
+.active {
+	background-color: var(--background-secondary);
+}
+
+.progress {
+	height: 1.5rem;
+	width: 0px;
+
+	background-color: var(--foreground);
+	position: absolute;
+	left: 20vw;
+	top: 0;
+}
+
+@keyframes progressBar {
+	from {
+		width: 0;
+	}
+	to {
+		width: 60vw;
+	}
+}
+
+.progressPlay {
+	animation: progressBar 32s linear;
+}
+
+.playerBtn {
+	border-radius: 100%;
+	border: 2px solid var(--foreground);
+
+	height: 4rem;
+	width: 4rem;
+
+	margin: 1rem auto;
+	font-size: 2rem;
+
+	display: flex;
+
+	& svg {
+		margin: auto;
+	}
+
+	&:hover {
+		cursor: pointer;
+	}
+}
+
+.playerTime {
+	font-size: 1.5rem;
+
+	display: flex;
+	justify-content: space-between;
+
+	position: absolute;
+	width: 60vw;
+	top: 2rem;
+	margin: 0 20vw;
+}
