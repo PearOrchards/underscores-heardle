@@ -1,11 +1,10 @@
 "use client";
 import styles from "./game.module.scss";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 import { useState, useEffect } from "react";
 import AttemptBox from "./(attemptBox)/attemptBox";
 import Player from "@/app/_components/(game)/(player)/player";
+import Input from "@/app/_components/(game)/(input)/input";
 
 export default function Game() {
 	const [currentAttempt, setCurrentAttempt] = useState<number>(0);
@@ -30,6 +29,7 @@ export default function Game() {
 			</div>
 			<div className={styles.bottom}>
 				<Player parentGuess={ currentAttempt } />
+				<Input />
 			</div>
 			<button onClick={() => setCurrentAttempt(currentAttempt + 1)}>increment</button>
 		</>
