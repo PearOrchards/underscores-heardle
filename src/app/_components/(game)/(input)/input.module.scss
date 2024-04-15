@@ -54,3 +54,36 @@
 		}
 	}
 }
+
+.suggestions {
+	position: absolute;
+	bottom: 100%;
+
+	width: 100%;
+
+	display: none;
+	flex-flow: column nowrap;
+
+	& p {
+		width: 100%;
+		padding: .5rem 1rem;
+
+		border: 2px solid var(--foreground-secondary);
+		border-bottom: none;
+		background: var(--background);
+
+		&:hover {
+			background: var(--background-secondary);
+			cursor: pointer;
+		}
+
+		&:first-child {
+			border-top-left-radius: 4px;
+			border-top-right-radius: 4px;
+		}
+	}
+}
+
+.suggestionsShow {
+	display: flex;
+}

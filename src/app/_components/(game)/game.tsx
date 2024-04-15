@@ -28,8 +28,8 @@ export default function Game() {
 				})}
 			</div>
 			<div className={styles.bottom}>
-				<Player parentGuess={ currentAttempt } />
-				<Input />
+				<Player currentAttempt={ currentAttempt } />
+				<Input currentAttempt={ currentAttempt } />
 			</div>
 			<button onClick={() => setCurrentAttempt(currentAttempt + 1)}>increment</button>
 		</>

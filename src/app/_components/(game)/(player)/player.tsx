@@ -6,7 +6,7 @@ import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
 
 import {useState, useRef, useEffect} from "react";
 
-export default function Player({ parentGuess } : { parentGuess: number }) {
+export default function Player({ currentAttempt } : { currentAttempt: number }) {
 	const [playing, setPlaying] = useState<boolean>(false);
 	const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 	const [displayedTime, setDisplayedTime] = useState<number>(0);
@@ -19,7 +19,7 @@ export default function Player({ parentGuess } : { parentGuess: number }) {
 			
 			const timer = setTimeout(() => {
 				stop();
-			}, Math.pow(2, parentGuess) * 1000);
+			}, Math.pow(2, currentAttempt) * 1000);
 			setTimer(timer);
 		}
 	}
@@ -51,7 +51,7 @@ export default function Player({ parentGuess } : { parentGuess: number }) {
 			<div className={styles.track}>
 				<div className={styles.innerTrack}>
 					{[0, 1, 2, 3, 4, 5].map((i) => {
-						return <div className={`${styles.block} ${parentGuess >= i ? styles.active : ""}`}
+						return <div className={`${styles.block} ${currentAttempt >= i ? styles.active : ""}`}
 						            key={i}></div>
 					})}
 				</div>
