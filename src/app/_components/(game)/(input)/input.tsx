@@ -9,8 +9,8 @@ import { useState, useRef } from "react";
 
 export default function Input({ currentAttempt } : { currentAttempt: number }) {
 	const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
-	const inputRef = useRef<HTMLInputElement>(null);
 	const [suggestions, setSuggestions] = useState<string[]>([]);
+	const inputRef = useRef<HTMLInputElement>(null);
 	
 	const clear = () => {
 		if (inputRef.current) inputRef.current.value = "";
@@ -19,16 +19,14 @@ export default function Input({ currentAttempt } : { currentAttempt: number }) {
 		if (inputRef.current) inputRef.current.value = suggestion;
 	}
 	
-	const onFocus = () => {
+	const onFocus = async () => {
 		const stringToCheck = inputRef.current?.value;
-		if (stringToCheck) show();
-		else blur();
-	}
-	const show = () => {
-		songs(inputRef.current?.value || "").then((suggestions) => {
+		if (stringToCheck) {
+			const suggestions = await songs(inputRef.current?.value || "");
 			setSuggestions(suggestions);
 			setShowSuggestions(true);
-		});
+		}
+		else blur();
 	}
 	const blur = () => {
 		setTimeout(() => { // delay to allow click event to fire :(
@@ -49,7 +47,9 @@ export default function Input({ currentAttempt } : { currentAttempt: number }) {
 				<FontAwesomeIcon icon={faXmark} onClick={clear}/>
 			</form>
 			<div className={styles.buttonRow}>
-				<button>SKIP (+{Math.pow(2, currentAttempt)}s)</button>
+				<button>SKIP {
+					currentAttempt < 5 ? `(+${Math.pow(2, currentAttempt)}s)` : ""
+				}</button>
 				<button>SUBMIT</button>
 			</div>
 		</>
