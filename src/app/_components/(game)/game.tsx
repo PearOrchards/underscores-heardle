@@ -16,8 +16,6 @@ export default function Game() {
 				setCurrentAttempt(parseInt(attempts));
 			}
 		}
-		
-		console.log(currentAttempt);
 	}, []);
 	
 	return (
