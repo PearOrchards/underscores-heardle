@@ -47,7 +47,7 @@ export default function Player({ currentAttempt } : { currentAttempt: number }) 
 	
 	return (
 		<>
-			<audio src="" ref={audioRef}></audio>
+			<audio src="/api/audio" ref={audioRef}></audio>
 			<div className={styles.track}>
 				<div className={styles.innerTrack}>
 					{[0, 1, 2, 3, 4, 5].map((i) => {
