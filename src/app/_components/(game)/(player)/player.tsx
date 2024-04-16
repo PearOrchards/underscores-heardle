@@ -1,4 +1,3 @@
-"use client";
 import styles from "./player.module.scss";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -46,7 +45,7 @@ export default function Player({ currentAttempt } : { currentAttempt: number }) 
 	}, []);
 	
 	return (
-		<>
+		<section>
 			<audio src="/api/audio" ref={audioRef}></audio>
 			<div className={styles.track}>
 				<div className={styles.innerTrack}>
@@ -66,6 +65,6 @@ export default function Player({ currentAttempt } : { currentAttempt: number }) 
 				<p>0:{ String(displayedTime).padStart(2, '0') }</p>
 				<p>0:16</p>
 			</div>
-		</>
+		</section>
 	)
 }

@@ -1,4 +1,4 @@
-import { promises as fs } from "fs";
+import songToday from "@/app/_components/songToday";
 
 async function getSoundcloudAudio(url: string): Promise<string> {
 	const songData = await fetch(`https://api-widget.soundcloud.com/resolve?url=${url}&client_id=${process.env.SOUNDCLOUD_CLIENT}&format=json`)
@@ -21,22 +21,7 @@ async function getPillowcaseAudio(url: string): Promise<string> {
 }
 
 export async function GET() {
-	if (!process.env.HARDLY_RANDOM_SEED) return { status: 500, body: "Environment not correctly set up." };
-	
-	const file = await fs.readFile(process.cwd() + "/src/app/songList.json", 'utf-8');
-	const songList = JSON.parse(file);
-	
-	const totalSongs: number = songList.soundcloud.length + songList.dubious.length;
-	
-	const now = new Date();
-	const daysSinceEpoch = Math.floor(now.getTime() / 8.64e7);
-	const todayPick = daysSinceEpoch * parseInt(process.env.HARDLY_RANDOM_SEED) % totalSongs;
-	
-	const song = todayPick < songList.soundcloud.length
-		? songList.soundcloud[todayPick]
-		: songList.dubious[todayPick - songList.soundcloud.length];
-	const source = todayPick < songList.soundcloud.length ? "soundcloud" : "dubious";
-	
+	const [song, source] = await songToday();
 	let audioFile = "";
 	
 	switch (source) {
