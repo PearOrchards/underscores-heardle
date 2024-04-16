@@ -6,7 +6,7 @@ import { faSearch, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 import { useState, useRef } from "react";
 
-export default function Input({ currentAttempt, guess } : { currentAttempt: number, guess: (g: string) => void }) {
+export default function Input({ currentAttempt, complete, guess } : { currentAttempt: number, complete: boolean, guess: (g: string) => void }) {
 	const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 	const [suggestions, setSuggestions] = useState<string[]>([]);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -44,7 +44,7 @@ export default function Input({ currentAttempt, guess } : { currentAttempt: numb
 		}
 	}
 	
-	return (
+	return !complete ? (
 		<section>
 			<form className={styles.input} onSubmit={async (ev) => { ev.preventDefault(); await submitGuess() }}>
 				<div className={`${styles.suggestions} ${showSuggestions ? styles.suggestionsShow : ""}`}>
@@ -63,5 +63,5 @@ export default function Input({ currentAttempt, guess } : { currentAttempt: numb
 				<button onClick={submitGuess} >SUBMIT</button>
 			</div>
 		</section>
-	)
+	): null;
 }

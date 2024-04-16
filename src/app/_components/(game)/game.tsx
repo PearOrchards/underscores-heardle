@@ -51,8 +51,8 @@ export default function Game() {
 				)
 			}
 			<div className={styles.bottom}>
-				<Player currentAttempt={ currentAttempt } />
-				<Input currentAttempt={ currentAttempt } guess={guess} />
+				<Player currentAttempt={currentAttempt} complete={complete} />
+				<Input currentAttempt={currentAttempt} complete={complete} guess={guess} />
 			</div>
 		</>
 	)

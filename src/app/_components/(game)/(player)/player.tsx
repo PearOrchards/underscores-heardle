@@ -5,7 +5,7 @@ import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
 
 import {useState, useRef, useEffect} from "react";
 
-export default function Player({ currentAttempt } : { currentAttempt: number }) {
+export default function Player({ currentAttempt, complete } : { currentAttempt: number, complete: boolean }) {
 	const [playing, setPlaying] = useState<boolean>(false);
 	const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 	const [displayedTime, setDisplayedTime] = useState<number>(0);
@@ -16,10 +16,12 @@ export default function Player({ currentAttempt } : { currentAttempt: number }) 
 			audioRef.current.play();
 			setPlaying(true);
 			
-			const timer = setTimeout(() => {
-				stop();
-			}, Math.pow(2, currentAttempt) * 1000);
-			setTimer(timer);
+			if (!complete) {
+				const timer = setTimeout(() => {
+					stop();
+				}, Math.pow(2, currentAttempt) * 1000);
+				setTimer(timer);
+			}
 		}
 	}
 	
@@ -44,17 +46,28 @@ export default function Player({ currentAttempt } : { currentAttempt: number }) 
 		}
 	}, []);
 	
+	useEffect(() => {
+		if (complete && audioRef.current) {
+			if (timer) { // Cancel the timer if it's still running
+				clearTimeout(timer);
+				setTimer(null);
+			}
+			
+			audioRef.current.play();
+			setPlaying(true);
+		}
+	}, [complete]);
+	
 	return (
 		<section>
 			<audio src="/api/audio" ref={audioRef}></audio>
 			<div className={styles.track}>
 				<div className={styles.innerTrack}>
-					{[0, 1, 2, 3, 4, 5].map((i) => {
-						return <div className={`${styles.block} ${currentAttempt >= i ? styles.active : ""}`}
-						            key={i}></div>
-					})}
+					{ !complete ? [0, 1, 2, 3, 4, 5].map((i) => {
+						return <div className={`${styles.block} ${currentAttempt >= i ? styles.active : ""}`} key={i}></div>
+					}) : null }
 				</div>
-				<div className={`${styles.progress} ${ playing ? styles.progressPlay : ""}`}></div>
+				<div className={`${styles.progress} ${ playing ? styles.progressPlay : ""}`} style={{ animationDuration: complete ? Math.floor(audioRef.current?.duration || 0) + "s" : "32s" }}></div>
 			</div>
 			<div className={styles.playerBtn} onClick={ !playing ? play : stop }>
 				{
@@ -63,7 +76,10 @@ export default function Player({ currentAttempt } : { currentAttempt: number }) 
 			</div>
 			<div className={styles.playerTime}>
 				<p>0:{ String(displayedTime).padStart(2, '0') }</p>
-				<p>0:16</p>
+				<p>{ !complete
+						? "0:16"
+						: Math.floor((audioRef.current?.duration || 0) / 60) + ":" + String(Math.floor(audioRef.current?.duration || 0) % 60).padStart(2, '0')
+				}</p>
 			</div>
 		</section>
 	)
