@@ -6,7 +6,7 @@ export async function songs(query: string): Promise<string[]> {
 	const songList = JSON.parse(file);
 	
 	const songNames = [ ...songList.soundcloud.map((song: any) => song.answer),
-		...songList.dubious.map((song: any) => song.answer) ];
+		...songList.tracker.map((song: any) => song.answer) ];
 	
 	return (query == "") ? songNames : songNames.filter((song) => song.toLowerCase().includes(query.toLowerCase()));
 }

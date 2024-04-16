@@ -28,7 +28,7 @@ export async function GET() {
 		case "soundcloud":
 			audioFile = await getSoundcloudAudio(song.link);
 			break;
-		case "dubious":
+		case "tracker":
 			audioFile = await getPillowcaseAudio(song.link);
 			break;
 		default:

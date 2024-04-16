@@ -7,7 +7,7 @@ export default async function songToday() {
 	const file = await fs.readFile(process.cwd() + "/src/app/songList.json", 'utf-8');
 	const songList = JSON.parse(file);
 	
-	const totalSongs: number = songList.soundcloud.length + songList.dubious.length;
+	const totalSongs: number = songList.soundcloud.length + songList.tracker.length;
 	
 	const now = new Date();
 	const daysSinceEpoch = Math.floor(now.getTime() / 8.64e7);
@@ -15,7 +15,7 @@ export default async function songToday() {
 	
 	const song = todayPick < songList.soundcloud.length
 		? songList.soundcloud[todayPick]
-		: songList.dubious[todayPick - songList.soundcloud.length];
-	const source = todayPick < songList.soundcloud.length ? "soundcloud" : "dubious";
+		: songList.tracker[todayPick - songList.soundcloud.length];
+	const source = todayPick < songList.soundcloud.length ? "soundcloud" : "tracker";
 	return [ song, source ];
 }

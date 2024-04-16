@@ -1,0 +1,51 @@
+.topBox {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-between;
+
+	width: 40vw;
+	height: 8rem;
+
+	padding: .5rem;
+	margin: 1rem;
+
+	background: var(--link);
+
+	& img {
+		height: 100%;
+		width: auto;
+		aspect-ratio: 1/1;
+
+		border-radius: 8px;
+	}
+
+	& span {
+		margin: auto 1rem;
+		display: flex;
+		flex-flow: column nowrap;
+
+		& p:first-child {
+			font-size: 1.5rem;
+		}
+
+		& p:last-child {
+			font-size: 1.25rem;
+		}
+	}
+
+	& a {
+		margin: auto 1rem;
+		font-size: 1.25rem;
+		white-space: nowrap;
+	}
+}
+
+.leftBlock {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: flex-start;
+}
+
+.middleSection {
+
+}
