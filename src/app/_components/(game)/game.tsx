@@ -71,6 +71,18 @@ export default function Game() {
 		
 		window.localStorage.setItem("done", JSON.stringify(true));
 		
+		const history = window.localStorage.getItem("history");
+		const date = dateToday();
+		if (history) {
+			const parsedHistory = JSON.parse(history);
+			if (!parsedHistory[date]) parsedHistory[date] = guesses.length + 1;
+			window.localStorage.setItem("history", JSON.stringify(parsedHistory));
+		} else {
+			const newHistory: any = { };
+			newHistory[date] = guesses.length + 1;
+			window.localStorage.setItem("history", JSON.stringify(newHistory));
+		}
+		
 		setSongData(songData);
 		setComplete(true);
 	}
