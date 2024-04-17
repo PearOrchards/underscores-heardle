@@ -32,7 +32,9 @@ export async function GET() {
 			audioFile = await getPillowcaseAudio(song.link);
 			break;
 		default:
-			return { status: 500, body: "Source not implemented." };
+			return new Response("Source not implemented", {
+				status: 500,
+			});
 	}
 	
 	const audio = await fetch(audioFile);
