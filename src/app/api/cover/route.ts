@@ -18,7 +18,8 @@ export async function GET(req: NextRequest) {
 	
 	if (source == "soundcloud") {
 		const cover = await getSoundcloudCover(song.link);
-		const imageData = await fetch(cover);
+		const coverLarge = cover.replace("large", "t250x250"); // Get a larger image to increase quality.
+		const imageData = await fetch(coverLarge);
 		buffer = await imageData.arrayBuffer();
 	} else {
 		const local = path.join(process.cwd(), "public", "defaultCover.png");

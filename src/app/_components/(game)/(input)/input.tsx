@@ -6,7 +6,7 @@ import { faSearch, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 import { useState, useRef } from "react";
 
-export default function Input({ currentAttempt, complete, guess } : { currentAttempt: number, complete: boolean, guess: (g: string) => void }) {
+export default function Input({ currentAttempt, complete, guess, skip } : { currentAttempt: number, complete: boolean, guess: (g: string) => void, skip: () => void }) {
 	const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 	const [suggestions, setSuggestions] = useState<string[]>([]);
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -57,7 +57,7 @@ export default function Input({ currentAttempt, complete, guess } : { currentAtt
 				<FontAwesomeIcon icon={faXmark} onClick={clear}/>
 			</form>
 			<div className={styles.buttonRow}>
-				<button>SKIP {
+				<button onClick={skip}>SKIP {
 					currentAttempt < 5 ? `(+${Math.pow(2, currentAttempt)}s)` : ""
 				}</button>
 				<button onClick={submitGuess} >SUBMIT</button>

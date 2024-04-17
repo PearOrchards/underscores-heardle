@@ -1,13 +1,31 @@
+.complete {
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: space-between;
+	padding: 1rem;
+
+	height: 75vh;
+
+	& h1 {
+		color: var(--foreground-secondary);
+		font-size: 2rem;
+	}
+
+	& p {
+		font-size: 1.5rem;
+	}
+}
+
 .topBox {
 	display: flex;
 	flex-flow: row nowrap;
 	justify-content: space-between;
 
-	width: 40vw;
+	width: min-content;
+	min-width: 40vw;
 	height: 8rem;
 
 	padding: .5rem;
-	margin: 1rem;
 
 	background: var(--link);
 
@@ -46,6 +64,33 @@
 	justify-content: flex-start;
 }
 
-.middleSection {
+.middleSection, .bottomSection {
+	text-align: center;
+}
 
+.barsHolder {
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: center;
+	gap: 2px;
+	margin: .5rem;
+
+	& .attemptBlock {
+		width: 1.5rem;
+		height: .5rem;
+
+		background-color: var(--background-secondary);
+
+		&.wrong {
+			background-color: #aa0000;
+		}
+
+		&.correct {
+			background-color: #00aa00;
+		}
+
+		&.skip {
+			background-color: var(--foreground-secondary);
+		}
+	}
 }
