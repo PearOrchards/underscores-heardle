@@ -5,7 +5,7 @@ import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
 
 import {useState, useRef, useEffect} from "react";
 
-export default function Player({ currentAttempt, complete } : { currentAttempt: number, complete: boolean }) {
+export default function Player({ currentAttempt, complete, doNotAutoplay } : { currentAttempt: number, complete: boolean, doNotAutoplay: boolean }) {
 	const [playing, setPlaying] = useState<boolean>(false);
 	const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 	const [displayedTime, setDisplayedTime] = useState<number>(0);
@@ -47,7 +47,7 @@ export default function Player({ currentAttempt, complete } : { currentAttempt: 
 	}, []);
 	
 	useEffect(() => {
-		if (complete && audioRef.current) {
+		if (complete && audioRef.current && !doNotAutoplay) {
 			if (timer) { // Cancel the timer if it's still running
 				clearTimeout(timer);
 				setTimer(null);

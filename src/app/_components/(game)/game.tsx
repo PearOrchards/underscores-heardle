@@ -21,6 +21,7 @@ export default function Game() {
 	const [guesses, setGuesses] = useState<string[]>([])
 	const [complete, setComplete] = useState<boolean>(false);
 	const [songData, setSongData] = useState<SongData | null>(null);
+	const [doNotAutoplay, setDoNotAutoplay] = useState<boolean>(false);
 	
 	useEffect(() => {
 		console.log("hello! welcome to the underscores heardle!");
@@ -34,7 +35,8 @@ export default function Game() {
 			if (savedDate == dateToday()) {
 				setGuesses(JSON.parse(attempts));
 				const done = window.localStorage.getItem("done");
-				if (done) setComplete(true);
+				setDoNotAutoplay(true);
+				if (done) gameComplete();
 			} else {
 				window.localStorage.removeItem("guesses");
 				window.localStorage.removeItem("done");
@@ -87,7 +89,7 @@ export default function Game() {
 				)
 			}
 			<div className={styles.bottom}>
-				<Player currentAttempt={ guesses.length } complete={complete} />
+				<Player currentAttempt={ guesses.length } complete={complete} doNotAutoplay={doNotAutoplay} />
 				<Input currentAttempt={ guesses.length } complete={complete} guess={guess} skip={skip} />
 			</div>
 		</>
