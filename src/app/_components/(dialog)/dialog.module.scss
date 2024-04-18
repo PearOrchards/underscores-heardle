@@ -27,7 +27,12 @@
 			width: 2rem;
 		}
 
-		& a { color: var(--link); }
+		& a {
+			color: var(--link);
+			&:hover {
+				text-decoration: underline;
+			}
+		}
 	}
 
 	& div {
