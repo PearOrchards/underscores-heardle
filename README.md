@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# underscores heardle
+**A replica of Heardle, but with songs by underscores.**
 
-## Getting Started
+## But... Why?
+To start, this was created for the [daily underscores heardle series](https://www.youtube.com/playlist?list=PLAEc0HKmIWO-oDNPLi1aL1aazsqdxYhPg), which uses [shelly's](https://not.apictureof.me) version of the [underscores Heardle](https://heardle.apictureof.me/).
 
-First, run the development server:
+Most clones of Heardle use Soundcloud only for their backend, which is fine, except that after doing the Heardle 100 times, I started to get the same songs over and over again, which didn't make the videos very interesting. So I decided I'd add some absolutely ridiculous songs to the list, and here we are.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## How To Play
+1. Go to the underscores heardle website (not currently deployed)
+2. Follow the instructions on the screen 
+3. That's pretty much it
+4. I don't really know what else to add here it's just a like any other Heardle lol
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Running Locally
+If you want to run this locally instead (maybe because you want to change the songs or something), you can do so by following these steps:
+1. Clone the repository
+2. Run `npm install` to install the dependencies
+3. Run `npm run dev` to start a development server
+4. Go to `localhost:3000` in your browser!
 
-You can start editing the page by modifying `app/navbar.tsx`. The page auto-updates as you edit the file.
+Basically, treat it like any other Next.JS project
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Contributing
+You are more than welcome to contribute to the Heardle-ing (I'm making that a word now). Mostly I might need help with design (especially around mobile devices), so by all means feel free to open up a pull request!
 
-## Learn More
+I will just ask that you don't add songs to the song list. But, if you want to fork this and make your own Heardle with a different artists songs, absolutely go for it!
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Credit To:
+- [shelly](https://not.apictureof.me) for the original underscores Heardle
+- the [underscores tracker](https://docs.google.com/spreadsheets/d/1iCQqZtmjrmcQzZEQdsn4ZViI2y3BUtCuyCQag011iK8/edit?usp=sharing) for an (incredibly) comprehensive list of underscores songs
+- everyone who's been watching the series
