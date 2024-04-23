@@ -22,14 +22,10 @@ export async function GET(req: NextRequest) {
 		const imageData = await fetch(coverLarge);
 		buffer = await imageData.arrayBuffer();
 	} else {
-		const local = path.join(process.cwd(), "public", "defaultCover.png");
+		const local = path.join(process.cwd(), "public", "dvd.svg");
 		buffer = readFileSync(local);
 	}
 	
-	return new Response(buffer, {
-		headers: {
-			"Content-Type": "image/png"
-		}
-	});
+	return new Response(buffer);
 }
 export const dynamic = 'force-dynamic';
