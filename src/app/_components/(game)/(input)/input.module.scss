@@ -87,3 +87,33 @@
 .suggestionsShow {
 	display: flex;
 }
+
+@media screen and (max-width: 1100px) {
+	.input {
+		width: 80vw;
+
+		& svg {
+			height: 2rem;
+		}
+
+		& input[type=text] {
+			font-size: 1.75rem;
+			padding: .5rem 4rem;
+		}
+	}
+
+	.buttonRow {
+		width: 80vw;
+
+		& button {
+			font-size: 1.75rem;
+		}
+	}
+
+	.suggestions {
+		& p {
+			padding: .5rem 1rem;
+			font-size: 1.25rem;
+		}
+	}
+}

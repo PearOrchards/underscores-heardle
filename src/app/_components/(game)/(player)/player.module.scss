@@ -31,7 +31,7 @@
 
 .progress {
 	height: 1.5rem;
-	width: 0px;
+	width: 0;
 
 	background-color: var(--foreground);
 	position: absolute;
@@ -83,4 +83,36 @@
 	width: 60vw;
 	top: 2rem;
 	margin: 0 20vw;
+}
+
+@media screen and (max-width: 1100px) {
+	@keyframes progressBar {
+		from {
+			width: 0;
+		}
+		to {
+			width: 80vw;
+		}
+	}
+
+	.innerTrack {
+		width: 80vw;
+	}
+
+	.progress {
+		left: 10vw;
+	}
+
+	.playerBtn {
+		height: 6rem;
+		width: 6rem;
+		margin: 2rem auto;
+
+		font-size: 2.5rem;
+	}
+
+	.playerTime {
+		width: 80vw;
+		margin: 0 10vw;
+	}
 }

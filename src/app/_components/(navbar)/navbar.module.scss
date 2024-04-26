@@ -39,3 +39,9 @@
 .center {
 	font-size: 2rem;
 }
+
+@media (max-width: 1100px) {
+	.nav {
+		padding: 1rem 5vw;
+	}
+}
