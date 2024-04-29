@@ -13,7 +13,19 @@ config.autoAddCss = false;
 
 export const metadata: Metadata = {
 	title: "underscores heardle",
-	description: "Made by PearOrchards, inspired by heardle.apictureof.me",
+	description: "a heardle game with underscores stuff. inspired by heardle.apictureof.me",
+	openGraph: {
+		title: "underscores heardle",
+		description: "a heardle game with underscores stuff. inspired by heardle.apictureof.me",
+		url: process.env.URL,
+		locale: "en_GB",
+		type: "website",
+	},
+	twitter: {
+		creator: "@pearorchards_",
+		card: "summary_large_image"
+	},
+	metadataBase: new URL(process.env.URL || ""),
 };
 
 export const viewport: Viewport = {

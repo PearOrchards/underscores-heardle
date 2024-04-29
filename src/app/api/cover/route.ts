@@ -26,6 +26,11 @@ export async function GET(req: NextRequest) {
 		buffer = readFileSync(local);
 	}
 	
-	return new Response(buffer);
+	return new Response(buffer, {
+		headers: {
+			"Content-Type": "image/svg+xml",
+			"Cache-Control": "public, max-age=604800, immutable",
+		},
+	});
 }
 export const dynamic = 'force-dynamic';

@@ -11,8 +11,6 @@ export default function AttemptBox({ parentActive, parentGuess } : { parentActiv
 		setActive(parentActive);
 	}, [parentActive]);
 	
-	console.log(parentGuess);
-	
 	return (
 		<div className={`${styles.attemptBox} ${ active ? styles.active : '' }`}>
 			<p>
