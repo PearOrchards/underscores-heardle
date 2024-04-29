@@ -1,18 +1,32 @@
 import { useState, useEffect } from "react";
 import styles from "./attemptBox.module.scss";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTimes, faForward } from "@fortawesome/free-solid-svg-icons";
+
 export default function AttemptBox({ parentActive, parentGuess } : { parentActive: boolean, parentGuess: string }) {
 	const [active, setActive] = useState<boolean>(parentActive);
-	const [guess, setGuess] = useState<string>(parentGuess);
 	
 	useEffect(() => {
 		setActive(parentActive);
-		setGuess(parentGuess);
-	}, [parentActive, parentGuess]);
+	}, [parentActive]);
+	
+	console.log(parentGuess);
 	
 	return (
 		<div className={`${styles.attemptBox} ${ active ? styles.active : '' }`}>
-			<p>{parentGuess}</p>
+			<p>
+				{ parentGuess === "" ?
+					<>
+						<FontAwesomeIcon icon={faForward} /> <span>SKIPPED</span>
+					</> :
+					parentGuess !== undefined ?
+						<>
+							<FontAwesomeIcon icon={faTimes} /> <span>{parentGuess}</span>
+						</>
+						: null
+				}
+			</p>
 		</div>
 	)
 }

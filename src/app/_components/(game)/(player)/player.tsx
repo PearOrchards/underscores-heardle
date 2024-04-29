@@ -75,11 +75,17 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 				}
 			</div>
 			<div className={styles.playerTime}>
-				<p>0:{ String(displayedTime).padStart(2, '0') }</p>
-				<p>{ !complete
+				<p>
+					{
+						Math.floor(displayedTime / 60) + ":" + String(Math.floor(displayedTime % 60)).padStart(2, '0')
+					}
+				</p>
+				<p>
+					{ !complete // The reason this uses audioRef.current.duration rather than using state is because it doesn't change.
 						? "0:16"
 						: Math.floor((audioRef.current?.duration || 0) / 60) + ":" + String(Math.floor(audioRef.current?.duration || 0) % 60).padStart(2, '0')
-				}</p>
+					}
+				</p>
 			</div>
 		</section>
 	)
