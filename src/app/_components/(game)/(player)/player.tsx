@@ -1,17 +1,33 @@
 import styles from "./player.module.scss";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPlay, faStop } from "@fortawesome/free-solid-svg-icons";
+import { faPlay, faStop, faEllipsis, faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 
 import {useState, useRef, useEffect} from "react";
+import Dialog from "@/app/_components/(dialog)/dialog";
+import songToday from "@/app/_components/songToday";
 
 export default function Player({ currentAttempt, complete, doNotAutoplay } : { currentAttempt: number, complete: boolean, doNotAutoplay: boolean }) {
+	// Player functionality states
+	const [ready, setReady] = useState<boolean>(false);
+	const [error, setError] = useState<string>("");
 	const [playing, setPlaying] = useState<boolean>(false);
+	
+	// Player timer states
 	const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 	const [displayedTime, setDisplayedTime] = useState<number>(0);
+	
+	// Modal states (for errors)
+	const [modalOpen, setModalOpen] = useState<boolean>(false);
+	const openErrorModal = () => setModalOpen(true);
+	const closeErrorModal = () => setModalOpen(false);
+	const [song, setSong] = useState<string>(""); // ONLY TO BE SET WHEN AN ERROR OCCURS
+	
 	const audioRef = useRef<HTMLAudioElement>(null);
 	
 	const play = () => {
+		if (!ready) return;
+		
 		if (audioRef.current) {
 			audioRef.current.play();
 			setPlaying(true);
@@ -38,8 +54,33 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 		}
 	}
 	
+	// Audio loading and time display
 	useEffect(() => {
 		if (audioRef.current) {
+			fetch("/api/audio")
+				.then(r => {
+					if (r.ok) return r.arrayBuffer();
+					else {
+						if (r.status === 408) {
+							setError("Hang on! We can't connect to the API. You can either try again later or click this box to get the answer.")
+							songToday().then(([song]) => setSong(song.answer));
+						} else if (r.status === 418) {
+							setError("AH!!! You cut us off! Please reload and be patient!")
+						} else {
+							setError("Something went wrong... Please try again (later) or click this box to get the answer.")
+							songToday().then(([song]) => setSong(song.answer));
+						}
+						return null;
+					}
+				})
+				.then(buffer => {
+					if (audioRef.current && buffer instanceof ArrayBuffer) {
+						audioRef.current.src = URL.createObjectURL(new Blob([buffer], {type: "audio/mpeg"}));
+						setReady(true);
+					}
+				});
+			// End of fetch
+			
 			audioRef.current.addEventListener('timeupdate', () => {
 				setDisplayedTime(Math.floor(audioRef.current?.currentTime || 0));
 			});
@@ -60,7 +101,7 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 	
 	return (
 		<section>
-			<audio src="/api/audio" ref={audioRef}></audio>
+			<audio ref={audioRef}></audio>
 			<div className={styles.track}>
 				<div className={styles.innerTrack}>
 					{ !complete ? [0, 1, 2, 3, 4, 5].map((i) => {
@@ -71,7 +112,9 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 			</div>
 			<div className={styles.playerBtn} onClick={ !playing ? play : stop }>
 				{
-					!playing ? <FontAwesomeIcon icon={faPlay}/> : <FontAwesomeIcon icon={faStop}/>
+					ready ?
+						!playing ? <FontAwesomeIcon icon={faPlay}/> : <FontAwesomeIcon icon={faStop}/>
+						: <FontAwesomeIcon icon={faEllipsis} opacity={0.5} />
 				}
 			</div>
 			<div className={styles.playerTime}>
@@ -87,6 +130,21 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 					}
 				</p>
 			</div>
+			{ error
+				? <>
+					<p className={styles.playerError} onClick={openErrorModal}>
+						<FontAwesomeIcon icon={faExclamationCircle} />
+						{error}
+					</p>
+					<Dialog isOpen={modalOpen} onClose={closeErrorModal}>
+						<h2>whoops</h2>
+						<p>
+							Since something has gone wrong, we&apos;ll just give you the answer <br />
+							It&apos;s &quot;{song}&quot;
+						</p>
+					</Dialog>
+				</> : null
+			}
 		</section>
 	)
 }

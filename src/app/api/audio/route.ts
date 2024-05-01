@@ -37,14 +37,32 @@ export async function GET() {
 			});
 	}
 	
-	const audio = await fetch(audioFile);
-	const audioBuffer = await audio.arrayBuffer();
-	
-	return new Response(audioBuffer, {
-		headers: {
-			"Content-Type": "audio/mpeg",
-			"Content-Length": audioBuffer.byteLength.toString(),
+	try {
+		const audio = await fetch(audioFile, {
+			signal: AbortSignal.timeout(5000) // Give up after 5 seconds
+		});
+		const audioBuffer = await audio.arrayBuffer();
+		
+		return new Response(audioBuffer, {
+			headers: {
+				"Content-Type": "audio/mpeg",
+				"Content-Length": audioBuffer.byteLength.toString(),
+			}
+		})
+	} catch (err: any) {
+		if (err.name == "TimeoutError") { // AbortSignal throws this error
+			return new Response("API_TIMEOUT", {
+				status: 408,
+			})
+		} else if (err.name == "AbortError") { // Thrown if user clicks a "stop" button
+			return new Response("API_ABORTED", {
+				status: 418, // Is this is an appropriate use of this status code? No? But it's funny?
+			})
+		} else { // Catch-all
+			return new Response("API_UNKNOWN_ERROR", {
+				status: 500,
+			})
 		}
-	})
+	}
 }
 export const dynamic = 'force-dynamic';
