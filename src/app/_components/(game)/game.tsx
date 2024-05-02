@@ -8,7 +8,7 @@ import Player from "@/app/_components/(game)/(player)/player";
 import Input from "@/app/_components/(game)/(input)/input";
 
 import songToday from "@/app/_components/songToday";
-import Complete from "@/app/_components/(complete)/complete";
+import Complete from "@/app/_components/(game)/(complete)/complete";
 
 import { SongData } from "@/app/_components/SongData";
 

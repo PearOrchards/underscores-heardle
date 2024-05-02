@@ -99,4 +99,20 @@
 	.bottomSection {
 		margin-bottom: 5vh;
 	}
+
+	.topBox {
+		width: 80vw;
+	}
+}
+
+@media (max-width: 440px) {
+	.topBox img {
+		display: none;
+	}
+}
+
+@media (max-height: 800px) {
+	.bottomSection {
+		margin-bottom: 12vh;
+	}
 }
