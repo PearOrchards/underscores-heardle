@@ -11,26 +11,42 @@ async function getSoundcloudCover(url: string): Promise<string> {
 	return songJson.artwork_url.replace("large", "t250x250"); // Get a larger image to increase quality.
 }
 
+async function getPillowcaseCover(url: string): Promise<string> {
+	const id = url.split("/").pop();
+	return `https://api.pillowcase.su/api/cover/${id}`;
+}
+
 export async function GET(req: NextRequest) {
 	const { link, source } = await SongToday();
-	let buffer: ArrayBuffer;
 	
+	let cover;
+	switch (source) {
+		case "soundcloud":
+			cover = await getSoundcloudCover(link);
+			break;
+		case "tracker":
+			cover = await getPillowcaseCover(link);
+			break;
+		default:
+			cover = "";
+	}
+	
+	let buffer: ArrayBuffer;
+	let contentType: string;
 	try {
-		if (source == "soundcloud") {
-			const cover = await getSoundcloudCover(link);
-			const imageData = await fetch(cover);
-			buffer = await imageData.arrayBuffer();
-		} else {
-			throw new Error("Source not implemented");
-		}
+		if (cover === "") throw new Error("No cover found."); // Just so the catch below can pick it up.
+		const imageData = await fetch(cover);
+		buffer = await imageData.arrayBuffer();
+		contentType = imageData.headers.get("Content-Type") ?? "image/png";
 	} catch (err: any) {
 		const local = path.join(process.cwd(), "public", "dvd.svg");
 		buffer = readFileSync(local);
+		contentType = "image/svg+xml";
 	}
 	
 	return new Response(buffer, {
 		headers: {
-			"Content-Type": "image/svg+xml",
+			"Content-Type": contentType,
 			"Cache-Control": "public, max-age=604800, immutable",
 		},
 	});
