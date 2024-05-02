@@ -2,13 +2,13 @@
 **A replica of Heardle, but with songs by underscores.**
 
 ## But... Why?
-To start, this was created for the [daily underscores heardle series](https://www.youtube.com/playlist?list=PLAEc0HKmIWO-oDNPLi1aL1aazsqdxYhPg), which uses [shelly's](https://not.apictureof.me) version of the [underscores Heardle](https://heardle.apictureof.me/).
+To start, this was created for the [daily underscores heardle series](https://www.youtube.com/playlist?list=PLAEc0HKmIWO-oDNPLi1aL1aazsqdxYhPg), which started by using [shelly's](https://not.apictureof.me) version of the [underscores Heardle](https://heardle.apictureof.me/).
 
 Most clones of Heardle use Soundcloud only for their backend, which is fine, except that after doing the Heardle 100 times, I started to get the same songs over and over again, which didn't make the videos very interesting. So I decided I'd add some absolutely ridiculous songs to the list, and here we are.
 
 ## How To Play
-1. Go to the underscores heardle website (not currently deployed)
-2. Follow the instructions on the screen 
+1. Go to the [underscores heardle website](https://heardle.orchards.dev) 
+2. If you don't know how to play, click the question mark in the navbar
 3. That's pretty much it
 4. I don't really know what else to add here it's just a like any other Heardle lol
 
@@ -29,4 +29,4 @@ I will just ask that you don't add songs to the song list. But, if you want to f
 ## Credit To:
 - [shelly](https://not.apictureof.me) for the original underscores Heardle
 - the [underscores tracker](https://docs.google.com/spreadsheets/d/1iCQqZtmjrmcQzZEQdsn4ZViI2y3BUtCuyCQag011iK8/edit?usp=sharing) for an (incredibly) comprehensive list of underscores songs
-- everyone who's been watching the series
+- everyone who's been watching the series on YouTube <3
