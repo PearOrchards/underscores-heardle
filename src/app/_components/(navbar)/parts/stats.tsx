@@ -23,7 +23,7 @@ export default function Stats() {
 	const openStatsModal = () => setShowStatsModal(true);
 	const closeStatsModal = () => setShowStatsModal(false);
 	
-	useEffect(() => {
+	const updateStats = () => {
 		const history = window.localStorage.getItem("history");
 		if (history) {
 			const parsed = JSON.parse(history);
@@ -31,12 +31,13 @@ export default function Stats() {
 			let won = 0;
 			let currentStreak = 0;
 			let bestStreak = 0;
-			const distribution = [0,0,0,0,0,0,0];
+			const distribution = [0, 0, 0, 0, 0, 0, 0];
 			
 			Object.entries(parsed).forEach(([date, guess]) => {
 				played++;
 				if (parseInt(guess as string) < 7) {
-					won++; currentStreak++;
+					won++;
+					currentStreak++;
 					if (currentStreak > bestStreak) bestStreak = currentStreak;
 				} else {
 					currentStreak = 0;
@@ -52,7 +53,11 @@ export default function Stats() {
 				distribution
 			});
 		}
-		
+	}
+	
+	useEffect(() => {
+		updateStats();
+		window.addEventListener("gameComplete", updateStats); // custom event handler. fired in game.tsx
 	}, []);
 	
 	return (

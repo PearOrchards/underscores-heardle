@@ -83,6 +83,9 @@ export default function Game() {
 			window.localStorage.setItem("history", JSON.stringify(newHistory));
 		}
 		
+		// firing custom event (received in stats.tsx)
+		window.dispatchEvent(new Event("gameComplete"));
+		
 		setSongData(songData);
 		setComplete(true);
 	}
