@@ -1,4 +1,4 @@
-import songToday from "@/app/_components/songToday";
+import { SongToday } from "@/app/_components/SongToday";
 
 async function getSoundcloudAudio(url: string): Promise<string> {
 	const songData = await fetch(`https://api-widget.soundcloud.com/resolve?url=${url}&client_id=${process.env.SOUNDCLOUD_CLIENT}&format=json`)
@@ -21,15 +21,15 @@ async function getPillowcaseAudio(url: string): Promise<string> {
 }
 
 export async function GET() {
-	const [song, source] = await songToday();
+	const { link, source } = await SongToday();
 	let audioFile = "";
 	
 	switch (source) {
 		case "soundcloud":
-			audioFile = await getSoundcloudAudio(song.link);
+			audioFile = await getSoundcloudAudio(link);
 			break;
 		case "tracker":
-			audioFile = await getPillowcaseAudio(song.link);
+			audioFile = await getPillowcaseAudio(link);
 			break;
 		default:
 			return new Response("Source not implemented", {

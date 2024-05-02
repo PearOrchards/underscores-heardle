@@ -1,5 +1,5 @@
 import styles from "./complete.module.scss";
-import { SongData } from "@/app/_components/SongData";
+import type { SongData } from "@/app/_components/SongToday";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";

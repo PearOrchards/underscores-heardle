@@ -5,7 +5,7 @@ import { faPlay, faStop, faEllipsis, faExclamationCircle } from "@fortawesome/fr
 
 import {useState, useRef, useEffect} from "react";
 import Dialog from "@/app/_components/(dialog)/dialog";
-import songToday from "@/app/_components/songToday";
+import { SongToday } from "@/app/_components/SongToday";
 
 export default function Player({ currentAttempt, complete, doNotAutoplay } : { currentAttempt: number, complete: boolean, doNotAutoplay: boolean }) {
 	// Player functionality states
@@ -63,12 +63,12 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 					else {
 						if (r.status === 408) {
 							setError("Hang on! We can't connect to the API. You can either try again later or click this box to get the answer.")
-							songToday().then(([song]) => setSong(song.answer));
+							SongToday().then((s) => setSong(s.answer));
 						} else if (r.status === 418) {
 							setError("AH!!! You cut us off! Please reload and be patient!")
 						} else {
 							setError("Something went wrong... Please try again (later) or click this box to get the answer.")
-							songToday().then(([song]) => setSong(song.answer));
+							SongToday().then(s => setSong(s.answer));
 						}
 						return null;
 					}

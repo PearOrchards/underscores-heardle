@@ -7,10 +7,8 @@ import AttemptBox from "./(attemptBox)/attemptBox";
 import Player from "@/app/_components/(game)/(player)/player";
 import Input from "@/app/_components/(game)/(input)/input";
 
-import songToday from "@/app/_components/songToday";
+import { IsGuessCorrect, SongToday, type SongData } from "@/app/_components/SongToday";
 import Complete from "@/app/_components/(game)/(complete)/complete";
-
-import { SongData } from "@/app/_components/SongData";
 
 const dateToday = () => {
 	const today = new Date();
@@ -46,12 +44,9 @@ export default function Game() {
 	}, []);
 	
 	const guess = async (g: string) => {
-		const s= await songToday();
-		const today = s[0].answer;
-		
 		updateGuesses(g);
 		
-		if (g === today || guesses.length == 6) await gameComplete();
+		if (await IsGuessCorrect(g) || guesses.length == 6) await gameComplete();
 	}
 	
 	const skip = async () => {
@@ -66,9 +61,7 @@ export default function Game() {
 	}
 	
 	const gameComplete = async () => {
-		const s= await songToday();
-		const songData: SongData = { answer: s[0].answer, link: s[0].link, source: s[1] };
-		
+		const songData= await SongToday();
 		window.localStorage.setItem("done", JSON.stringify(true));
 		
 		const history = window.localStorage.getItem("history");
