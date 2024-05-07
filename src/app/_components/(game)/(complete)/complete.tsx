@@ -10,6 +10,12 @@ import { useState } from "react";
 
 const completionMessages = ["how???", "amazing!", "great job!", "nice!", "alright!", "close one!", "unlucky..."]
 
+const coverLink = () => {
+	const now = new Date();
+	const str = now.toISOString().split("T")[0];
+	return `/api/cover?t=${str}`;
+}
+
 export default function Complete({ songData, guesses } : { songData: SongData | null, guesses: string[] }) {
 	const [th, setTH] = useState<number>(0);
 	const [uh, setUH] = useState<number>(0);
@@ -54,7 +60,7 @@ export default function Complete({ songData, guesses } : { songData: SongData | 
 		<section className={styles.complete}>
 			<div className={styles.topBox}>
 				<div className={styles.leftBlock}>
-					<img src={"/api/cover"} alt="Album cover" />
+					<img src={coverLink()} alt="Album cover" />
 					<span>
 						<p>underscores</p>
 						<p>{songData?.answer}</p>

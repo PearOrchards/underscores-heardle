@@ -7,6 +7,12 @@ import {useState, useRef, useEffect} from "react";
 import Dialog from "@/app/_components/(dialog)/dialog";
 import { SongToday } from "@/app/_components/SongToday";
 
+const audioLink = () => {
+	const now = new Date();
+	const str = now.toISOString().split("T")[0];
+	return `/api/audio?t=${str}`;
+}
+
 export default function Player({ currentAttempt, complete, doNotAutoplay } : { currentAttempt: number, complete: boolean, doNotAutoplay: boolean }) {
 	// Player functionality states
 	const [ready, setReady] = useState<boolean>(false);
@@ -57,7 +63,7 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 	// Audio loading and time display
 	useEffect(() => {
 		if (audioRef.current) {
-			fetch("/api/audio")
+			fetch(audioLink())
 				.then(r => {
 					if (r.ok) return r.arrayBuffer();
 					else {
