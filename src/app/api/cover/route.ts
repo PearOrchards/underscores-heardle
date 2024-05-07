@@ -40,9 +40,9 @@ export async function GET(req: NextRequest) {
 		buffer = await imageData.arrayBuffer();
 		contentType = imageData.headers.get("Content-Type") ?? "image/png";
 	} catch (err: any) {
-		const local = path.join(process.cwd(), "public", "dvd.svg");
+		const local = path.join(process.cwd(), "public", "dvd.png");
 		buffer = readFileSync(local);
-		contentType = "image/svg+xml";
+		contentType = "image/png";
 	}
 	
 	return new Response(buffer, {

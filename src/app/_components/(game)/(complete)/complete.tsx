@@ -60,7 +60,7 @@ export default function Complete({ songData, guesses } : { songData: SongData | 
 		<section className={styles.complete}>
 			<div className={styles.topBox}>
 				<div className={styles.leftBlock}>
-					<img src={coverLink()} alt="Album cover" />
+					<Image src={coverLink()} width={250} height={250} alt="Album cover" />
 					<span>
 						<p>underscores</p>
 						<p>{songData?.answer}</p>
