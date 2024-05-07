@@ -36,6 +36,7 @@ export async function GET(req: NextRequest) {
 	try {
 		if (cover === "") throw new Error("No cover found."); // Just so the catch below can pick it up.
 		const imageData = await fetch(cover);
+		if (!imageData.ok) throw new Error("Couldn't get cover.");
 		buffer = await imageData.arrayBuffer();
 		contentType = imageData.headers.get("Content-Type") ?? "image/png";
 	} catch (err: any) {
