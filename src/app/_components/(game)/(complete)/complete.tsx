@@ -1,8 +1,9 @@
 import styles from "./complete.module.scss";
 import type { SongData } from "@/app/_components/SongToday";
+import { HeardleNumber } from "@/app/_components/HeardleNumber";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
+import { faChevronRight, faShareNodes } from "@fortawesome/free-solid-svg-icons";
 
 import Image from "next/image"; // Try use without caching
 import Link from "next/link";
@@ -17,6 +18,8 @@ const coverLink = () => {
 }
 
 export default function Complete({ songData, guesses } : { songData: SongData | null, guesses: string[] }) {
+	const [copiedSuccessfully, setCopiedSuccessfully] = useState<boolean>(false);
+	
 	const [th, setTH] = useState<number>(0);
 	const [uh, setUH] = useState<number>(0);
 	const [tm, setTM] = useState<number>(0);
@@ -56,6 +59,26 @@ export default function Complete({ songData, guesses } : { songData: SongData | 
 		setUS(seconds % 10);
 	}, 1000);
 	
+	const share = async () => {
+		let clipboardData = `underscores heardle #${await HeardleNumber()}\n\n🔊`;
+		for (let i = 0; i < 6; i++) {
+			if (guesses[i] === songData?.answer) clipboardData += `🟩`;
+			else if (guesses[i]) clipboardData += `🟥`;
+			else if (guesses[i] === "") clipboardData += `🟨`;
+			else clipboardData += `⬛`;
+		}
+		clipboardData += `\n\n🔗 ${window.location.href}`;
+		
+		navigator.clipboard.writeText(clipboardData).then(() => { // Success!
+			setCopiedSuccessfully(true);
+			setTimeout(() => {
+				setCopiedSuccessfully(false);
+			}, 2000);
+		}, () => { // Fallback, rejected
+			alert("Couldn't copy to clipboard!");
+		});
+	}
+	
 	return (
 		<section className={styles.complete}>
 			<div className={styles.topBox}>
@@ -80,6 +103,11 @@ export default function Complete({ songData, guesses } : { songData: SongData | 
 							: `You didn't guess the song this time. Better luck tomorrow!`
 					}
 				</p>
+				{ copiedSuccessfully ? <p className={styles.copied}>copied!</p> : null }
+				<button className="alt undoTransform" onClick={share}>
+					<FontAwesomeIcon icon={faShareNodes} />
+					share
+				</button>
 			</div>
 			<div className={styles.bottomSection}>
 				<h1>next heardle in:</h1>

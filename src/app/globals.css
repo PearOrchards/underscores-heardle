@@ -54,6 +54,15 @@ button {
 		background: var(--link);
 	}
 
+	&.undoTransform {
+		transform: none;
+		left: unset;
+	}
+
+	& svg {
+		margin-right: .5rem;
+	}
+
 	&:hover {
 		cursor: pointer;
 		filter: brightness(1.1);

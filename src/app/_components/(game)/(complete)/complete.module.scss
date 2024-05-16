@@ -66,6 +66,10 @@
 	text-align: center;
 }
 
+.middleSection p {
+	margin-bottom: .5rem;
+}
+
 .barsHolder {
 	display: flex;
 	flex-flow: row nowrap;
@@ -91,6 +95,12 @@
 			background-color: var(--foreground-secondary);
 		}
 	}
+}
+
+.copied {
+	font-size: 1.25rem;
+	color: var(--foreground-secondary);
+
 }
 
 @media (max-width: 1100px) {
