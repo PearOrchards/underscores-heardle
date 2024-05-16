@@ -90,7 +90,7 @@ export default function Stats() {
 										<span className={styles.dataDescriptor}>won</span>
 									</p>
 									<p>
-										{(stats.won / stats.played) * 100}%
+										{((stats.won / stats.played) * 100).toFixed(2)}%
 										<br/>
 										<span className={styles.dataDescriptor}>win rate</span>
 									</p>
