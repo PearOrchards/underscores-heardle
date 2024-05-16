@@ -43,15 +43,19 @@ export default function Game() {
 		window.localStorage.setItem("guessesDate", JSON.stringify(dateToday()));
 	}, []);
 	
+	useEffect(() => {
+		IsGuessCorrect(guesses[guesses.length - 1]).then(async (result) => {
+			if (result || guesses.length > 6) await gameComplete();
+			else if (guesses.length == 6) { updateGuesses(""); } // Add a blank guess to signify the end of the game.
+		});
+	}, [guesses]);
+	
 	const guess = async (g: string) => {
 		updateGuesses(g);
-		
-		if (await IsGuessCorrect(g) || guesses.length == 6) await gameComplete();
 	}
 	
 	const skip = async () => {
 		updateGuesses("");
-		if (guesses.length == 6) await gameComplete();
 	}
 	
 	const updateGuesses = (g: string) => {
@@ -68,11 +72,11 @@ export default function Game() {
 		const date = dateToday();
 		if (history) {
 			const parsedHistory = JSON.parse(history);
-			if (!parsedHistory[date]) parsedHistory[date] = guesses.length + 1;
+			if (!parsedHistory[date]) parsedHistory[date] = guesses.length;
 			window.localStorage.setItem("history", JSON.stringify(parsedHistory));
 		} else {
 			const newHistory: any = { };
-			newHistory[date] = guesses.length + 1;
+			newHistory[date] = guesses.length;
 			window.localStorage.setItem("history", JSON.stringify(newHistory));
 		}
 		
