@@ -131,7 +131,7 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 				</p>
 				<p>
 					{ !complete // The reason this uses audioRef.current.duration rather than using state is because it doesn't change.
-						? "0:16"
+						? "0:32"
 						: Math.floor((audioRef.current?.duration || 0) / 60) + ":" + String(Math.floor(audioRef.current?.duration || 0) % 60).padStart(2, '0')
 					}
 				</p>
