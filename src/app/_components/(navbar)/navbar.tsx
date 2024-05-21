@@ -11,7 +11,7 @@ export default function Navbar() {
 				<About />
 			</div>
 			<div className={styles.center}>
-				<h1>underscores heardle</h1>
+				<h1 data-cy='page-title'>underscores Heardle</h1>
 			</div>
 			<div className={styles.right}>
 				<Stats />

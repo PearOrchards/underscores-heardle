@@ -17,7 +17,7 @@ If you want to run this locally instead (maybe because you want to change the so
 1. Clone the repository
 2. Run `npm install` to install the dependencies
 3. Run `npm run dev` to start a development server
-4. Go to `localhost:3000` in your browser!
+4. Go to `localhost:5000` in your browser!
 
 Basically, treat it like any other Next.JS project
 
