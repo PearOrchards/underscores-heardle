@@ -109,14 +109,14 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 		<section>
 			<audio ref={audioRef}></audio>
 			<div className={styles.track}>
-				<div className={styles.innerTrack}>
+				<div className={styles.innerTrack} data-cy="innerTrack">
 					{ !complete ? [0, 1, 2, 3, 4, 5].map((i) => {
 						return <div className={`${styles.block} ${currentAttempt >= i ? styles.active : ""}`} key={i}></div>
 					}) : null }
 				</div>
 				<div className={`${styles.progress} ${ playing ? styles.progressPlay : ""}`} style={{ animationDuration: complete ? Math.floor(audioRef.current?.duration || 0) + "s" : "32s" }}></div>
 			</div>
-			<div className={styles.playerBtn} onClick={ !playing ? play : stop }>
+			<div className={styles.playerBtn} onClick={ !playing ? play : stop } data-cy="playerBtn">
 				{
 					ready ?
 						!playing ? <FontAwesomeIcon icon={faPlay}/> : <FontAwesomeIcon icon={faStop}/>

@@ -93,7 +93,7 @@ export default function Game() {
 				complete ? (
 					<Complete songData={songData} guesses={guesses} />
 				) : (
-					<section className={styles.attempts}>
+					<section className={styles.attempts} id="attemptBoxes">
 						{[0, 1, 2, 3, 4, 5].map((i) => {
 							return <AttemptBox key={i} parentActive={ guesses.length == i } parentGuess={guesses[i]} />
 						})}
