@@ -30,4 +30,4 @@ jobs:
       - name: Pull Changes
         run: ssh server 'cd heardle && git pull'
       - name: Rebuild
-        run: ssh server 'cd heardle && npm run build && pm2 restart heardle'
+        run: ssh server 'cd heardle && npm i && npm run build && pm2 restart heardle'
