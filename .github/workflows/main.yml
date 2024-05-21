@@ -13,7 +13,7 @@ jobs:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "SSH_PKEY" > ~/.ssh/pk
+          echo "$SSH_PKEY" > ~/.ssh/pk
           chmod 600 ~/.ssh/pk
           cat >>~/.ssh/config <<END
           Host server
