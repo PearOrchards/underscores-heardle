@@ -8,6 +8,7 @@ import { faChevronRight, faShareNodes } from "@fortawesome/free-solid-svg-icons"
 import Image from "next/image"; // Try use without caching
 import Link from "next/link";
 import { useState } from "react";
+import Dialog from "@/app/_components/(dialog)/dialog";
 
 const completionMessages = ["how???", "amazing!", "great job!", "nice!", "alright!", "close one!", "unlucky..."]
 
@@ -19,6 +20,10 @@ const coverLink = () => {
 
 export default function Complete({ songData, guesses } : { songData: SongData | null, guesses: string[] }) {
 	const [copiedSuccessfully, setCopiedSuccessfully] = useState<boolean>(false);
+	const [manualCopy, setManualCopy] = useState<string>("");
+	const [modalOpen, setModalOpen] = useState<boolean>(false);
+	const openCopyModal = () => setModalOpen(true);
+	const closeCopyModal = () => setModalOpen(false);
 	
 	const [th, setTH] = useState<number>(0);
 	const [uh, setUH] = useState<number>(0);
@@ -69,14 +74,19 @@ export default function Complete({ songData, guesses } : { songData: SongData | 
 		}
 		clipboardData += `\n\n🔗 ${window.location.href}`;
 		
-		navigator.clipboard.writeText(clipboardData).then(() => { // Success!
-			setCopiedSuccessfully(true);
-			setTimeout(() => {
-				setCopiedSuccessfully(false);
-			}, 2000);
-		}, () => { // Fallback, rejected
-			alert("Couldn't copy to clipboard!");
-		});
+		try {
+			navigator.clipboard.writeText(clipboardData).then(() => { // Success!
+				setCopiedSuccessfully(true);
+				setTimeout(() => {
+					setCopiedSuccessfully(false);
+				}, 2000);
+			}, () => { // Fallback, rejected
+				throw new Error("Rejected"); // Go to catch
+			});
+		} catch {
+			setManualCopy(clipboardData);
+			openCopyModal();
+		}
 	}
 	
 	return (
@@ -104,6 +114,11 @@ export default function Complete({ songData, guesses } : { songData: SongData | 
 					}
 				</p>
 				{ copiedSuccessfully ? <p className={styles.copied}>copied!</p> : null }
+				<Dialog isOpen={modalOpen} onClose={closeCopyModal}>
+					<h2>that&apos;s... awkward</h2>
+					<p>turns out I don&apos;t have access to your clipboard! so... could you just copy the stuff below? sorry :3</p>
+					<pre>{manualCopy}</pre>
+				</Dialog>
 				<button className="alt undoTransform" onClick={share}>
 					<FontAwesomeIcon icon={faShareNodes} />
 					share
