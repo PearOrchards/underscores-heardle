@@ -8,12 +8,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 2
     environment: production
     steps:
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh
-          echo "SSH_PKEY" > ~/.ssh/pk
+          echo "$SSH_PKEY" > ~/.ssh/pk
           chmod 600 ~/.ssh/pk
           cat >>~/.ssh/config <<END
           Host server
@@ -29,4 +30,4 @@ jobs:
       - name: Pull Changes
         run: ssh server 'cd heardle && git pull'
       - name: Rebuild
-        run: ssh server 'cd heardle && npm run build && pm2 restart heardle'
+        run: ssh server 'cd heardle && npm i && npm run build && pm2 restart heardle'
