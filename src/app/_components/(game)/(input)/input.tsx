@@ -52,15 +52,15 @@ export default function Input({ currentAttempt, complete, guess, skip } : { curr
 						<p onClick={() => autocomplete(s)} key={s}>{s}</p>
 					)) }
 				</div>
-				<input type="text" onFocus={onFocus} onBlur={blur} onChange={onFocus} placeholder="Know it? Search for the title" ref={inputRef}/>
+				<input type="text" onFocus={onFocus} onBlur={blur} onChange={onFocus} placeholder="Know it? Search for the title" ref={inputRef} data-cy="textInput" />
 				<FontAwesomeIcon icon={faSearch} />
 				<FontAwesomeIcon icon={faXmark} onClick={clear}/>
 			</form>
 			<div className={styles.buttonRow}>
-				<button onClick={skip}>SKIP {
+				<button onClick={skip} data-cy="skipBtn">SKIP {
 					currentAttempt < 5 ? `(+${Math.pow(2, currentAttempt)}s)` : ""
 				}</button>
-				<button onClick={submitGuess} >SUBMIT</button>
+				<button onClick={submitGuess} data-cy="submitBtn">SUBMIT</button>
 			</div>
 		</section>
 	): null;

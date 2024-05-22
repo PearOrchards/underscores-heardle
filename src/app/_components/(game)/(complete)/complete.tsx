@@ -80,7 +80,7 @@ export default function Complete({ songData, guesses } : { songData: SongData | 
 	}
 	
 	return (
-		<section className={styles.complete}>
+		<section className={styles.complete} data-cy="complete">
 			<div className={styles.topBox}>
 				<div className={styles.leftBlock}>
 					<Image src={coverLink()} width={250} height={250} alt="Album cover" />
