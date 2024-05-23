@@ -2,6 +2,7 @@ import { SongToday } from "@/app/_components/SongToday";
 
 async function getSoundcloudAudio(url: string): Promise<string> {
 	const songData = await fetch(`https://api-widget.soundcloud.com/resolve?url=${url}&client_id=${process.env.SOUNDCLOUD_CLIENT}&format=json`)
+	if (!songData.ok) return ""; // Likely 401, update the .env file with a new client ID
 	const songJson = await songData.json();
 	
 	if (!songData.ok) return "";
