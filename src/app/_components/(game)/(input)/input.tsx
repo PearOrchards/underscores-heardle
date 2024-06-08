@@ -83,12 +83,20 @@ export default function Input({ currentAttempt, complete, guess, skip } : { curr
 		}
 	}
 	
+	const hover = (ev: React.MouseEvent<HTMLParagraphElement>) => {
+		const suggestions = suggestionsRef.current?.querySelectorAll("p");
+		if (suggestions) {
+			suggestions.forEach(s => s.classList.remove(styles.selected));
+			ev.currentTarget.classList.add(styles.selected);
+		}
+	}
+	
 	return !complete ? (
 		<section>
 			<form className={styles.input} onSubmit={async (ev) => { ev.preventDefault(); await submitGuess() }}>
 				<div className={`${styles.suggestions} ${showSuggestions ? styles.suggestionsShow : ""}`} ref={suggestionsRef}>
 					{ suggestions.slice(0, 9).map(s => (
-						<p onClick={() => autocomplete(s)} key={s}>{s}</p>
+						<p onMouseEnter={hover} onClick={() => autocomplete(s)} key={s}>{s}</p>
 					)) }
 				</div>
 				<input type="text" onFocus={onFocus} onBlur={blur} onChange={onFocus} onKeyDown={keyPress} placeholder="Know it? Search for the title" ref={inputRef} data-cy="textInput" />
