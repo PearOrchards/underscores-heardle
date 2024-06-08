@@ -72,7 +72,7 @@
 		border-bottom: none;
 		background: var(--background);
 
-		&:hover {
+		&.selected {
 			background: var(--background-secondary);
 			cursor: pointer;
 		}

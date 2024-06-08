@@ -60,6 +60,8 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 		}
 	}
 	
+	const toggle = () => !playing ? play() : stop();
+	
 	// Audio loading and time display
 	useEffect(() => {
 		if (audioRef.current) {
@@ -105,6 +107,10 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 		}
 	}, [complete]);
 	
+	const keyDown = (ev: React.KeyboardEvent<HTMLDivElement>) => {
+		if (ev.key === "Enter" || ev.key === " ") toggle();
+	}
+	
 	return (
 		<section>
 			<audio ref={audioRef}></audio>
@@ -116,7 +122,7 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 				</div>
 				<div className={`${styles.progress} ${ playing ? styles.progressPlay : ""}`} style={{ animationDuration: complete ? Math.floor(audioRef.current?.duration || 0) + "s" : "32s" }}></div>
 			</div>
-			<div className={styles.playerBtn} onClick={ !playing ? play : stop } data-cy="playerBtn">
+			<div className={styles.playerBtn} onClick={toggle} data-cy="playerBtn" tabIndex={0} onKeyDown={keyDown}>
 				{
 					ready ?
 						!playing ? <FontAwesomeIcon icon={faPlay}/> : <FontAwesomeIcon icon={faStop}/>

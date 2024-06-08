@@ -10,6 +10,7 @@ export default function Input({ currentAttempt, complete, guess, skip } : { curr
 	const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 	const [suggestions, setSuggestions] = useState<string[]>([]);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const suggestionsRef = useRef<HTMLDivElement>(null);
 	
 	const clear = () => {
 		if (inputRef.current) inputRef.current.value = "";
@@ -30,6 +31,7 @@ export default function Input({ currentAttempt, complete, guess, skip } : { curr
 	const blur = () => {
 		setTimeout(() => { // delay to allow click event to fire :(
 			setShowSuggestions(false);
+			suggestionsRef.current?.querySelector(`.${styles.selected}`)?.classList.remove(styles.selected);
 		}, 100);
 	}
 	
@@ -44,15 +46,52 @@ export default function Input({ currentAttempt, complete, guess, skip } : { curr
 		}
 	}
 	
+	const keyPress = (ev: React.KeyboardEvent<HTMLInputElement>) => {
+		console.log(ev.key)
+		if (ev.key === "ArrowUp" || ev.key === "ArrowDown") {
+			ev.preventDefault();
+			const suggestions = suggestionsRef.current?.querySelectorAll("p");
+			if (suggestions) {
+				const oldSelected = suggestionsRef.current?.querySelector(`.${styles.selected}`);
+				let newSelected;
+				if (ev.key == "ArrowUp") {
+					const index = oldSelected ? Array.from(suggestions).indexOf(oldSelected as HTMLParagraphElement) : suggestions.length;
+					newSelected = suggestions[index - 1];
+				} else { // ArrowDown
+					const index = oldSelected ? Array.from(suggestions).indexOf(oldSelected as HTMLParagraphElement) : -1;
+					newSelected = suggestions[index + 1];
+				}
+				if (newSelected) {
+					oldSelected?.classList.remove(styles.selected);
+					newSelected.classList.add(styles.selected);
+				}
+			}
+		}
+		if (ev.key === "Enter") {
+			ev.preventDefault();
+			const selected = suggestionsRef.current?.querySelector(`.${styles.selected}`);
+			if (selected) { // Autocomplete
+				autocomplete(selected.textContent || "");
+				inputRef.current?.focus();
+				blur();
+			} else { // Submit, basically un-preventing default
+				submitGuess();
+			}
+		}
+		if (ev.key === "Escape") {
+			blur();
+		}
+	}
+	
 	return !complete ? (
 		<section>
 			<form className={styles.input} onSubmit={async (ev) => { ev.preventDefault(); await submitGuess() }}>
-				<div className={`${styles.suggestions} ${showSuggestions ? styles.suggestionsShow : ""}`}>
+				<div className={`${styles.suggestions} ${showSuggestions ? styles.suggestionsShow : ""}`} ref={suggestionsRef}>
 					{ suggestions.slice(0, 9).map(s => (
 						<p onClick={() => autocomplete(s)} key={s}>{s}</p>
 					)) }
 				</div>
-				<input type="text" onFocus={onFocus} onBlur={blur} onChange={onFocus} placeholder="Know it? Search for the title" ref={inputRef} data-cy="textInput" />
+				<input type="text" onFocus={onFocus} onBlur={blur} onChange={onFocus} onKeyDown={keyPress} placeholder="Know it? Search for the title" ref={inputRef} data-cy="textInput" />
 				<FontAwesomeIcon icon={faSearch} />
 				<FontAwesomeIcon icon={faXmark} onClick={clear}/>
 			</form>
