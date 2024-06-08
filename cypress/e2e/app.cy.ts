@@ -122,3 +122,71 @@ describe("Player functionality", () => {
 		cy.get("[data-cy=playerBtn] > svg").should("have.class", "fa-play");
 	});
 });
+
+describe("Input functionality", () => {
+	beforeEach(() => {
+		cy.visit("/");
+	})
+	
+	it("should not allow empty input", () => {
+		cy.get('[data-cy="textInput"]').type("{enter}");
+		cy.get('#attemptBoxes > :nth-child(1)').should("have.text", "");
+	})
+	
+	it("should not allow gibberish input", () => {
+		cy.get('[data-cy="textInput"]').type("ashgvd{enter}");
+		cy.get('#attemptBoxes > :nth-child(1)').should("have.text", "");
+	});
+	
+	it("should accept valid input", () => {
+		cy.get('[data-cy="textInput"]').click();
+		cy.wait(100);
+		cy.get('[data-cy="textInput"]').type("a");
+		cy.get('[class*=suggestionsShow] > p').first().click();
+		cy.get('[data-cy="textInput"]').type("{enter}");
+		cy.get('#attemptBoxes > :nth-child(1)').should("not.have.text", "");
+	});
+	
+	describe('using suggestions', () => {
+		beforeEach(() => {
+			cy.get('[data-cy="textInput"]').click();
+			cy.wait(100);
+			cy.get('[data-cy="textInput"]').type("a");
+		});
+		
+		it("should present suggestions on input", () => {
+			cy.get('[class*=suggestionsShow]').should("exist");
+			cy.get('[class*=suggestionsShow] > p').should("have.length.greaterThan", 0);
+		});
+		
+		
+		it("should select a suggestion by using mouse only", () => {
+			cy.get('[class*=suggestionsShow] > p').first().invoke("text")
+				.then((suggestionText) => {
+					cy.get('[class*=suggestionsShow] > p').first().click();
+					cy.get('[data-cy="textInput"]').should("have.value", suggestionText);
+				});
+		});
+		
+		it("should select a suggestion by using keyboard only", () => {
+			cy.get('[class*=suggestionsShow] > p').last().invoke("text")
+				.then((suggestionText) => {
+					cy.get('[data-cy="textInput"]').type("{uparrow}");
+					cy.get('[data-cy="textInput"]').type("{enter}");
+					cy.get('[data-cy="textInput"]').should("have.value", suggestionText);
+				})
+		});
+		
+		it("should select a suggestion by hovering first with mouse, then using keyboard", () => {
+			cy.get('[class*=suggestionsShow] > p').first().next().invoke("text")
+				.then((suggestionText) => {
+					cy.get('[class*=suggestionsShow] > p').first().trigger("mouseover", "center");
+					cy.wait(100);
+					cy.get('[data-cy="textInput"]').type("{downarrow}");
+					cy.wait(100);
+					cy.get('[data-cy="textInput"]').type("{enter}");
+					cy.get('[data-cy="textInput"]').should("have.value", suggestionText);
+				})
+		});
+	});
+});
