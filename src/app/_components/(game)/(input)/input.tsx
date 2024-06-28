@@ -47,7 +47,6 @@ export default function Input({ currentAttempt, complete, guess, skip } : { curr
 	}
 	
 	const keyPress = (ev: React.KeyboardEvent<HTMLInputElement>) => {
-		console.log(ev.key)
 		if (ev.key === "ArrowUp" || ev.key === "ArrowDown") {
 			ev.preventDefault();
 			const suggestions = suggestionsRef.current?.querySelectorAll("p");

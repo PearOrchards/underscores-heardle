@@ -2,6 +2,7 @@
 import styles from "./game.module.scss";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import AttemptBox from "./(attemptBox)/attemptBox";
 import Player from "@/app/_components/(game)/(player)/player";
@@ -9,6 +10,12 @@ import Input from "@/app/_components/(game)/(input)/input";
 
 import { IsGuessCorrect, SongToday, type SongData } from "@/app/_components/SongToday";
 import Complete from "@/app/_components/(game)/(complete)/complete";
+
+interface History {
+	[date: string]: any;
+	guesses: string[];
+	answer: string,
+}
 
 const dateToday = () => {
 	const today = new Date();
@@ -20,27 +27,45 @@ export default function Game() {
 	const [complete, setComplete] = useState<boolean>(false);
 	const [songData, setSongData] = useState<SongData | null>(null);
 	const [doNotAutoplay, setDoNotAutoplay] = useState<boolean>(false);
+	const router = useRouter();
 	
 	useEffect(() => {
 		console.log("hello! welcome to the underscores heardle!");
 		
-		const attempts = window.localStorage.getItem("guesses");
-		const date = window.localStorage.getItem("guessesDate");
+		let history = window.localStorage.getItem("history");
+		if (!history) {
+			const newHistory: any = { };
+			window.localStorage.setItem("history", JSON.stringify(newHistory));
+			history = window.localStorage.getItem("history");
+		}
 		
-		if (attempts && date) {
-			const savedDate = JSON.parse(date);
+		const parsedHistory = JSON.parse(history!) as History;
+		
+		// Backwards compatibility
+		if (typeof Object.values(parsedHistory)[0] === "number") {
+			const newHistory: any = { };
+			for (let [k, v] of Object.entries(parsedHistory)) {
+				newHistory[k] = {
+					guesses: new Array(v).fill(""), // Fill with empty strings
+					answer: "Migrated, so unsure."
+				}
+			}
 			
-			if (savedDate == dateToday()) {
-				setGuesses(JSON.parse(attempts));
-				const done = window.localStorage.getItem("done");
-				setDoNotAutoplay(true);
-				if (done) gameComplete();
-			} else {
-				window.localStorage.removeItem("guesses");
-				window.localStorage.removeItem("done");
+			window.localStorage.setItem("history", JSON.stringify(newHistory))
+			router.refresh();
+		}
+		
+		if (!parsedHistory[dateToday()]) {
+			parsedHistory[dateToday()] = {};
+			window.localStorage.setItem("history", JSON.stringify(parsedHistory));
+			setGuesses([]);
+		} else {
+			const today = parsedHistory[dateToday()];
+			setGuesses(today.guesses || []);
+			if (today.answer && today.answer !== "") {
+				setDoNotAutoplay(true); // gameComplete(); isn't needed, guesses useEffect triggers it anyway.
 			}
 		}
-		window.localStorage.setItem("guessesDate", JSON.stringify(dateToday()));
 	}, []);
 	
 	useEffect(() => {
@@ -49,6 +74,10 @@ export default function Game() {
 			else if (guesses.length == 6) { updateGuesses(""); } // Add a blank guess to signify the end of the game.
 		});
 	}, [guesses]);
+	
+	const updateOldHistory = () => {
+	
+	}
 	
 	const guess = async (g: string) => {
 		updateGuesses(g);
@@ -61,24 +90,21 @@ export default function Game() {
 	const updateGuesses = (g: string) => {
 		const newGuesses = [...guesses, g];
 		setGuesses(newGuesses);
-		window.localStorage.setItem("guesses", JSON.stringify(newGuesses));
+		
+		const history = window.localStorage.getItem("history");
+		const parsed = JSON.parse(history!) as History;
+		parsed[dateToday()].guesses = newGuesses;
+		
+		window.localStorage.setItem("history", JSON.stringify(parsed));
 	}
 	
 	const gameComplete = async () => {
 		const songData= await SongToday();
-		window.localStorage.setItem("done", JSON.stringify(true));
 		
 		const history = window.localStorage.getItem("history");
-		const date = dateToday();
-		if (history) {
-			const parsedHistory = JSON.parse(history);
-			if (!parsedHistory[date]) parsedHistory[date] = guesses.length;
-			window.localStorage.setItem("history", JSON.stringify(parsedHistory));
-		} else {
-			const newHistory: any = { };
-			newHistory[date] = guesses.length;
-			window.localStorage.setItem("history", JSON.stringify(newHistory));
-		}
+		const parsed = JSON.parse(history!) as History;
+		parsed[dateToday()].answer = songData.answer;
+		window.localStorage.setItem("history", JSON.stringify(parsed));
 		
 		// firing custom event (received in stats.tsx)
 		window.dispatchEvent(new Event("gameComplete"));
