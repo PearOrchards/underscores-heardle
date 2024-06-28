@@ -12,9 +12,10 @@ import { IsGuessCorrect, SongToday, type SongData } from "@/app/_components/Song
 import Complete from "@/app/_components/(game)/(complete)/complete";
 
 interface History {
-	[date: string]: any;
-	guesses: string[];
-	answer: string,
+	[date: string]: {
+		guesses?: string[];
+		answer?: string,
+	};
 }
 
 const dateToday = () => {
@@ -46,13 +47,13 @@ export default function Game() {
 			const newHistory: any = { };
 			for (let [k, v] of Object.entries(parsedHistory)) {
 				newHistory[k] = {
-					guesses: new Array(v).fill(""), // Fill with empty strings
-					answer: "Migrated, so unsure."
+					guesses: new Array(v), // Fill with empty strings
+					answer: "MIGRATED"
 				}
 			}
 			
 			window.localStorage.setItem("history", JSON.stringify(newHistory))
-			router.refresh();
+			router.refresh(); // To completely prevent old data from being used
 		}
 		
 		if (!parsedHistory[dateToday()]) {
@@ -74,10 +75,6 @@ export default function Game() {
 			else if (guesses.length == 6) { updateGuesses(""); } // Add a blank guess to signify the end of the game.
 		});
 	}, [guesses]);
-	
-	const updateOldHistory = () => {
-	
-	}
 	
 	const guess = async (g: string) => {
 		updateGuesses(g);
