@@ -29,7 +29,7 @@ export default function History() {
 	
 	return (
 		<>
-			<button onClick={openHistoryModal} className="">
+			<button onClick={openHistoryModal}>
 				<FontAwesomeIcon icon={faClock} />
 				historical data
 			</button>
