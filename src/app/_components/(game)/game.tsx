@@ -10,13 +10,7 @@ import Input from "@/app/_components/(game)/(input)/input";
 
 import { IsGuessCorrect, SongToday, type SongData } from "@/app/_components/SongToday";
 import Complete from "@/app/_components/(game)/(complete)/complete";
-
-interface History {
-	[date: string]: {
-		guesses?: string[];
-		answer?: string,
-	};
-}
+import { UpdateHistory, type History } from "./UpdateHistory";
 
 const dateToday = () => {
 	const today = new Date();
@@ -44,16 +38,10 @@ export default function Game() {
 		
 		// Backwards compatibility
 		if (typeof Object.values(parsedHistory)[0] === "number") {
-			const newHistory: any = { };
-			for (let [k, v] of Object.entries(parsedHistory)) {
-				newHistory[k] = {
-					guesses: new Array(v), // Fill with empty strings
-					answer: "MIGRATED"
-				}
-			}
-			
-			window.localStorage.setItem("history", JSON.stringify(newHistory))
-			router.refresh(); // To completely prevent old data from being used
+			UpdateHistory(parsedHistory).then((newHistory) => {
+				window.localStorage.setItem("history", JSON.stringify(newHistory));
+				router.refresh(); // To completely prevent old data from being used
+			});
 		}
 		
 		if (!parsedHistory[dateToday()]) {
