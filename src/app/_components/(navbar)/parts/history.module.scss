@@ -1,0 +1,48 @@
+.table {
+	width: 100%;
+	margin-top: 1rem;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+
+	& .title {
+		width: 100%;
+		display: flex;
+		flex-flow: row nowrap;
+
+		& p {
+			font-size: 1rem;
+			padding: .5rem;
+
+			&:first-child { flex: 1; font-weight: bold; }
+			&:last-child { flex: 5; }
+		}
+
+		&:nth-child(4n + 1) {
+			background-color: #2a2a2a;
+		}
+		&:nth-child(4n + 3) {
+			background-color: #333;
+		}
+		&:hover {
+			background-color: #444;
+			cursor: pointer;
+		}
+	}
+}
+
+.guesses {
+	background-color: #3a3a3a;
+	width: 100% !important;
+
+	&.hidden {
+		display: none;
+	}
+
+	& p {
+		width: 100%;
+		font-size: .75rem;
+		padding: .25rem;
+	}
+}

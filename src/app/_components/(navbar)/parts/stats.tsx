@@ -7,6 +7,7 @@ import { faChartSimple } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 
 import Dialog from "@/app/_components/(dialog)/dialog";
+import History from "./history";
 
 interface Stats {
 	played: number;
@@ -115,6 +116,7 @@ export default function Stats() {
 								</>
 							) : null}
 						</div>
+						<History />
 					</div>
 				</div>
 			</Dialog>
