@@ -39,7 +39,7 @@ export default function History() {
 					history ? (
 						<section className={styles.table}>
 							{
-								Object.entries(history).map(([date, data]: any) => (
+								Object.entries(history).filter(([, data]: any) => data.guesses).map(([date, data]: any) => (
 									<>
 										<div key={date} className={styles.title} onClick={() => setSelectedTitleElement(date)}>
 											<p className={styles.date}>{date}</p>

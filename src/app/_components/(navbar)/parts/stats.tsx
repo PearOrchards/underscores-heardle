@@ -35,15 +35,16 @@ export default function Stats() {
 			const distribution = [0, 0, 0, 0, 0, 0, 0];
 			
 			Object.entries(parsed).forEach(([date, data]: any) => {
-				played++;
-				if (data.guesses.length < 7) {
-					won++;
-					currentStreak++;
-					if (currentStreak > bestStreak) bestStreak = currentStreak;
-				} else {
-					currentStreak = 0;
+				played++
+				if (data.guesses) {
+					distribution[data.guesses.length - 1]++;
+					if (data.guesses.length >= 7) currentStreak = 0;
+					else {
+						won++;
+						currentStreak++;
+						if (currentStreak > bestStreak) bestStreak = currentStreak;
+					}
 				}
-				distribution[data.guesses.length - 1]++;
 			});
 			
 			setStats({
