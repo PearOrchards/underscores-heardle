@@ -47,9 +47,10 @@ export default function History() {
 										</div>
 										<div className={`${styles.guesses} ${selectedTitleElement == date ? "" : styles.hidden}`}>
 											{
-												data.guesses.map((guess: string, index: number) => (
-													<p key={index}>{index + 1}: {guess}</p>
-												))
+												data.guesses.map((guess: string, index: number) => {
+													if (typeof data.guesses[0] !== "string") return;
+													return (<p key={index}>{index + 1}: {guess}</p>)
+												})
 											}
 										</div>
 									</>

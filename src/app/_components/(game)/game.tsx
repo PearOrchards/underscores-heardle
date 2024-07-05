@@ -50,7 +50,7 @@ export default function Game() {
 			setGuesses([]);
 		} else {
 			const today = parsedHistory[dateToday()];
-			setGuesses(today.guesses || []);
+			setGuesses(today.guesses?.filter((g: any) => typeof g === "string") || []); // Filter out any non-string values (empty arrays from migration)
 			if (today.answer && today.answer !== "") {
 				setDoNotAutoplay(true); // gameComplete(); isn't needed, guesses useEffect triggers it anyway.
 			}
