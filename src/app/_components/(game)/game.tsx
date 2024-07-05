@@ -40,8 +40,9 @@ export default function Game() {
 		if (typeof Object.values(parsedHistory)[0] === "number") {
 			UpdateHistory(parsedHistory).then((newHistory) => {
 				window.localStorage.setItem("history", JSON.stringify(newHistory));
-				router.refresh(); // To completely prevent old data from being used
+				window.location.reload(); // To completely prevent old data from being used
 			});
+			return;
 		}
 		
 		if (!parsedHistory[dateToday()]) {
@@ -50,7 +51,7 @@ export default function Game() {
 			setGuesses([]);
 		} else {
 			const today = parsedHistory[dateToday()];
-			setGuesses(today.guesses?.filter((g: any) => typeof g === "string") || []); // Filter out any non-string values (empty arrays from migration)
+			setGuesses(today.guesses || []); // Filter out any non-string values (empty arrays from migration)
 			if (today.answer && today.answer !== "") {
 				setDoNotAutoplay(true); // gameComplete(); isn't needed, guesses useEffect triggers it anyway.
 			}
