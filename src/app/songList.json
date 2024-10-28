@@ -149,10 +149,6 @@
 			"link": "https://soundcloud.com/underscores/2ndhand"
 		},
 		{
-			"answer": "underscores - performing at the party (so i don't have to talk to anyone) [ft. motti]",
-			"link": "https://soundcloud.com/underscores/performing"
-		},
-		{
 			"answer": "underscores - pity points",
 			"link": "https://soundcloud.com/underscores/pitypoints"
 		},
@@ -271,9 +267,17 @@
 		{
 			"answer": "underscores - Stupid (Can't run from the urge)",
 			"link": "https://soundcloud.com/underscores/stupid"
+		},
+		{
+			"answer": "oklou - harvest sky (feat. underscores)",
+			"link": "https://soundcloud.com/oklou93/harvest-sky-feat-underscores"
 		}
 	],
 	"tracker": [
+		{
+			"answer": "underscores - Cooler than me (originally by Mike Posner)",
+			"link": "https://pillowcase.su/f/d16fc1d3ea31755b159991229fe38fc3"
+		},
 		{
 			"answer": "underscores - Party Rock Anthem (originally by LMFAO)",
 			"link": "https://pillowcase.su/f/fb40227f9281ee8c9f001325f0e67100"
@@ -312,9 +316,9 @@
 			"link": "https://pillowcase.su/f/d4fd8e3250551adaa9d9687501147b0f"
 		},
 		{
-			"answer": "underscores - Loansharks (UMRU, HELVETICAN & HIMERA TRANCE ACID EUPHORIAMIX 2009) [link redacted]",
+			"answer": "underscores - Loansharks (UMRU, HELVETICAN & HIMERA TRANCE ACID EUPHORIAMIX 2009)",
 			"link": "https://pillowcase.su/f/f677b960fca6e3e444c70a9196959116",
-			"offset": 1500
+			"offset": 2250
 		},
 		{
 			"answer": "underscores - Loansharks (Gabby Start Future Bass VIP)",
