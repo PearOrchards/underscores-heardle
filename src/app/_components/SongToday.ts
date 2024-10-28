@@ -5,6 +5,7 @@ export type SongData = {
 	answer: string;
 	link: string;
 	source: string;
+	offset?: number;
 }
 
 /*
@@ -54,7 +55,8 @@ export async function SongToday(): Promise<SongData> {
 	return {
 		answer: todayPick.answer,
 		link: todayPick.link,
-		source
+		source,
+		offset: todayPick.offset,
 	};
 }
 

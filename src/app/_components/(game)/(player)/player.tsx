@@ -18,6 +18,7 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 	const [ready, setReady] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
 	const [playing, setPlaying] = useState<boolean>(false);
+	const [offset, setOffset] = useState<number>(0); // Defined by songList, pulled from server and used to determine the starting pos of the song.
 	
 	// Player timer states
 	const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
@@ -50,7 +51,7 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 	const stop = () => {
 		if (audioRef.current) {
 			audioRef.current.pause();
-			audioRef.current.currentTime = 0;
+			audioRef.current.currentTime = offset;
 			setPlaying(false);
 			
 			if (timer) {
@@ -65,9 +66,14 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 	// Audio loading and time display
 	useEffect(() => {
 		if (audioRef.current) {
+			let tempOffset = 0;
 			fetch(audioLink())
 				.then(r => {
-					if (r.ok) return r.arrayBuffer();
+					if (r.ok) {
+						tempOffset = parseInt(r.headers.get("X-Offset") || "0") / 1000;
+						setOffset(tempOffset);
+						return r.arrayBuffer();
+					}
 					else {
 						if (r.status === 408) {
 							setError("Hang on! We can't connect to the API. You can either try again later or click this box to get the answer.")
@@ -84,6 +90,7 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 				.then(buffer => {
 					if (audioRef.current && buffer instanceof ArrayBuffer) {
 						audioRef.current.src = URL.createObjectURL(new Blob([buffer], {type: "audio/mpeg"}));
+						audioRef.current.currentTime = tempOffset;
 						setReady(true);
 					}
 				});
@@ -132,7 +139,7 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 			<div className={styles.playerTime}>
 				<p>
 					{
-						Math.floor(displayedTime / 60) + ":" + String(Math.floor(displayedTime % 60)).padStart(2, '0')
+						Math.floor(displayedTime / 60) + ":" + String(Math.floor(displayedTime % 60 - offset)).padStart(2, '0')
 					}
 				</p>
 				<p>

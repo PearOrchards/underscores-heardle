@@ -22,7 +22,7 @@ async function getPillowcaseAudio(url: string): Promise<string> {
 }
 
 export async function GET() {
-	const { link, source } = await SongToday();
+	const { link, source, offset } = await SongToday();
 	let audioFile = "";
 	
 	switch (source) {
@@ -48,6 +48,7 @@ export async function GET() {
 			headers: {
 				"Content-Type": "audio/mpeg",
 				"Content-Length": audioBuffer.byteLength.toString(),
+				"X-Offset": offset ? offset.toString() : "",
 			}
 		})
 	} catch (err: any) {
