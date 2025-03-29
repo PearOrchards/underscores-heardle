@@ -10,7 +10,7 @@ let refresh = "";
  * Creates a new Soundcloud access token with the client credentials. Should only be done if refreshing isn't possible.
  * @return {Promise<string>} New access token.
  */
-async function createAccess(): Promise<string> {
+export async function createAccess(): Promise<string> {
     const clientId = process.env.SOUNDCLOUD_CLIENT!;
     const clientSecret = process.env.SOUNDCLOUD_SECRET!;
 
@@ -80,9 +80,7 @@ async function refreshToken(): Promise<string> {
  * Returns a Soundcloud access token. Should be valid.
  * @return {Promise<string>} Current access token.
  */
-async function getSoundcloudToken(): Promise<string> {
+export async function getSoundcloudToken(): Promise<string> {
     if (access !== "") return access;
     else return createAccess();
 }
-
-module.exports = { getSoundcloudToken, createAccess };
