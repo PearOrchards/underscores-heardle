@@ -22,6 +22,7 @@ async function getSoundcloudAudioV2(url: string, retry = false): Promise<string>
 	// This is the weird bit. We *should* get a 302, saying "yup go here" but instead it just... returns the track info.
 	const resolveJson = await resolve.json();
 	if (!resolveJson || !resolveJson.id) return ""; // No ID, no track
+	if (resolveJson.access !== "playable") return getSoundcloudAudio(url); // Fallback for "private" tracks
 
 	const audioData = await fetch(`https://api.soundcloud.com/tracks/${resolveJson.id}/streams`, {
 		headers: {
@@ -34,6 +35,25 @@ async function getSoundcloudAudioV2(url: string, retry = false): Promise<string>
 	if (!audioJson || !audioJson.http_mp3_128_url) return ""; // No URL, no track
 
 	return audioJson.http_mp3_128_url;
+}
+
+/**
+ * Fallback in case the v2 fails, which it will for songs that have stats hidden, for some bizarre reason.
+ */
+async function getSoundcloudAudio(url: string): Promise<string> {
+	const songData = await fetch(`https://api-widget.soundcloud.com/resolve?url=${url}&client_id=${process.env.FALLBACK_CLIENT}&format=json`)
+	if (!songData.ok) return ""; // Likely 401, update the .env file with a new client ID
+	const songJson = await songData.json();
+
+	if (!songData.ok) return "";
+	if (songJson.media.transcodings[1].format.protocol !== "progressive") return ""; // :(
+	const newURL = songJson.media.transcodings[1].url;
+
+	const trackData = await fetch(newURL + `?client_id=${process.env.FALLBACK_CLIENT}`);
+	const trackJson = await trackData.json();
+
+	if (!trackData.ok || !trackJson.url) return "";
+	return trackJson.url;
 }
 
 async function getPillowcaseAudio(url: string): Promise<string> {
