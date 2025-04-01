@@ -2,11 +2,35 @@ import { SongToday } from "@/app/_components/SongToday";
 import { type NextRequest } from "next/server";
 import path from "node:path";
 import { readFileSync } from "node:fs";
+import { getSoundcloudToken, createAccess } from "@/app/_components/AuthSoundcloud";
 
+async function getSoundcloudCoverV2(url: string, retry = false): Promise<string> {
+	const access = await getSoundcloudToken();
+	// Again using undocumented behaviour
+	const resolve = await fetch(`https://api.soundcloud.com/resolve?url=${encodeURIComponent(url)}`, {
+		headers: {
+			"Authorization": `Bearer ${access}`,
+			"Accept": "application/json",
+		}
+	});
+	if (!resolve.ok) {
+		if (resolve.status === 401 && !retry) {
+			// Token expired, get a new one
+			await createAccess();
+			return getSoundcloudCoverV2(url, true);
+		} else throw new Error("Couldn't get cover.");
+	}
+	const resolveJson = await resolve.json();
+	if (!resolveJson || !resolveJson.artwork_url) throw new Error("Couldn't get cover.");
+
+	return resolveJson.artwork_url.replace("large", "t250x250"); // Get a larger image to increase quality.
+}
+
+// Not removing this yet if the new one has issues like it does with audio.
 async function getSoundcloudCover(url: string): Promise<string> {
 	const songData = await fetch(`https://api-widget.soundcloud.com/resolve?url=${url}&client_id=${process.env.SOUNDCLOUD_CLIENT}&format=json`)
 	const songJson = await songData.json();
-	
+
 	if (!songData.ok || !songJson.artwork_url) throw new Error("Couldn't get cover.")
 	return songJson.artwork_url.replace("large", "t250x250"); // Get a larger image to increase quality.
 }
@@ -18,11 +42,11 @@ async function getPillowcaseCover(url: string): Promise<string> {
 
 export async function GET(req: NextRequest) {
 	const { link, source } = await SongToday();
-	
+
 	let cover;
 	switch (source) {
 		case "soundcloud":
-			cover = await getSoundcloudCover(link);
+			cover = await getSoundcloudCoverV2(link);
 			break;
 		case "tracker":
 			cover = await getPillowcaseCover(link);
@@ -30,7 +54,7 @@ export async function GET(req: NextRequest) {
 		default:
 			cover = "";
 	}
-	
+
 	let buffer: ArrayBuffer;
 	let contentType: string;
 	try {
@@ -44,7 +68,7 @@ export async function GET(req: NextRequest) {
 		buffer = readFileSync(local);
 		contentType = "image/png";
 	}
-	
+
 	return new Response(buffer, {
 		headers: {
 			"Content-Type": contentType,
