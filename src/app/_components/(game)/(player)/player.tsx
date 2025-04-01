@@ -19,26 +19,26 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 	const [error, setError] = useState<string>("");
 	const [playing, setPlaying] = useState<boolean>(false);
 	const [offset, setOffset] = useState<number>(0); // Defined by songList, pulled from server and used to determine the starting pos of the song.
-	
+
 	// Player timer states
 	const [timer, setTimer] = useState<NodeJS.Timeout | null>(null);
 	const [displayedTime, setDisplayedTime] = useState<number>(0);
-	
+
 	// Modal states (for errors)
 	const [modalOpen, setModalOpen] = useState<boolean>(false);
 	const openErrorModal = () => setModalOpen(true);
 	const closeErrorModal = () => setModalOpen(false);
 	const [song, setSong] = useState<string>(""); // ONLY TO BE SET WHEN AN ERROR OCCURS
-	
+
 	const audioRef = useRef<HTMLAudioElement>(null);
-	
+
 	const play = () => {
 		if (!ready) return;
-		
+
 		if (audioRef.current) {
 			audioRef.current.play();
 			setPlaying(true);
-			
+
 			if (!complete) {
 				const timer = setTimeout(() => {
 					stop();
@@ -47,22 +47,22 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 			}
 		}
 	}
-	
+
 	const stop = () => {
 		if (audioRef.current) {
 			audioRef.current.pause();
 			audioRef.current.currentTime = offset;
 			setPlaying(false);
-			
+
 			if (timer) {
 				clearTimeout(timer);
 				setTimer(null);
 			}
 		}
 	}
-	
+
 	const toggle = () => !playing ? play() : stop();
-	
+
 	// Audio loading and time display
 	useEffect(() => {
 		if (audioRef.current) {
@@ -72,6 +72,7 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 					if (r.ok) {
 						tempOffset = parseInt(r.headers.get("X-Offset") || "0") / 1000;
 						setOffset(tempOffset);
+						console.log(tempOffset);
 						return r.arrayBuffer();
 					}
 					else {
@@ -95,29 +96,29 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 					}
 				});
 			// End of fetch
-			
+
 			audioRef.current.addEventListener('timeupdate', () => {
 				setDisplayedTime(Math.floor(audioRef.current?.currentTime || 0));
 			});
 		}
 	}, []);
-	
+
 	useEffect(() => {
 		if (complete && audioRef.current && !doNotAutoplay) {
 			if (timer) { // Cancel the timer if it's still running
 				clearTimeout(timer);
 				setTimer(null);
 			}
-			
+
 			audioRef.current.play();
 			setPlaying(true);
 		}
 	}, [complete]);
-	
+
 	const keyDown = (ev: React.KeyboardEvent<HTMLDivElement>) => {
 		if (ev.key === "Enter" || ev.key === " ") toggle();
 	}
-	
+
 	return (
 		<section>
 			<audio ref={audioRef}></audio>
@@ -139,7 +140,7 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 			<div className={styles.playerTime}>
 				<p>
 					{
-						Math.floor(displayedTime / 60) + ":" + String(Math.floor(displayedTime % 60 - offset)).padStart(2, '0')
+						Math.floor(displayedTime / 60) + ":" + String(Math.floor(displayedTime % 60 - Math.floor(offset))).padStart(2, '0')
 					}
 				</p>
 				<p>
