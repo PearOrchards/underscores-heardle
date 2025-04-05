@@ -11,12 +11,13 @@ async function getSoundcloudAudioV2(url: string, retry = false): Promise<string>
 		}
 	});
 	if (!resolve.ok) {
+		const err = await resolve.json();
 		if (resolve.status === 401 && !retry) {
 			// Token expired, get a new one
 			await createAccess();
 			return getSoundcloudAudioV2(url, true);
 		} else {
-			return ""; // Some other error
+			return getSoundcloudAudio(url); // Some other error, try fallback.
 		}
 	}
 	// This is the weird bit. We *should* get a 302, saying "yup go here" but instead it just... returns the track info.

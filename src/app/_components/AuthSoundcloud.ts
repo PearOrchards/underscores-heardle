@@ -28,7 +28,11 @@ export async function createAccess(): Promise<string> {
         },
         body,
     });
-    if (!req.ok) { throw new Error("Couldn't get access token."); }
+    if (!req.ok) {
+        const err = await req.json();
+        console.error(err);
+        throw new Error("Couldn't get access token.");
+    }
 
     const json = await req.json();
     access = json.access_token;
@@ -36,7 +40,7 @@ export async function createAccess(): Promise<string> {
 
     setTimeout(refreshToken, json.expires_in * 950); // Token expires in ~1h, refresh it a little before
 
-    return access;
+    return json.access_token;
 }
 
 /**
