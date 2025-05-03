@@ -1,5 +1,15 @@
 import { SongToday } from "@/app/_components/SongToday";
 import { getSoundcloudToken, createAccess } from "@/app/_components/AuthSoundcloud";
+import Soundcloud from "soundcloud.ts";
+
+
+async function getSoundcloudTSAudio(url: string): Promise<string> {
+	const sc = new Soundcloud();
+	const track = await sc.tracks.get(url);
+	if (!track) return ""; // No track, no audio
+
+	return sc.util.streamLink(url, "progressive");
+}
 
 async function getSoundcloudAudioV2(url: string, retry = false): Promise<string> {
 	const access = await getSoundcloudToken();
@@ -68,7 +78,7 @@ export async function GET() {
 
 	switch (source) {
 		case "soundcloud":
-			audioFile = await getSoundcloudAudioV2(link);
+			audioFile = await getSoundcloudTSAudio(link);
 			break;
 		case "tracker":
 			audioFile = await getPillowcaseAudio(link);
