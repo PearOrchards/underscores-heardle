@@ -1,7 +1,11 @@
 import { SongToday } from "@/app/_components/SongToday";
 import { getSoundcloudToken, createAccess } from "@/app/_components/AuthSoundcloud";
 import Soundcloud from "soundcloud.ts";
-
+import ffmpeg from "fluent-ffmpeg";
+import { NextRequest } from "next/server";
+import { tmpdir } from "os";
+import path from "node:path";
+import * as fs from "node:fs";
 
 async function getSoundcloudTSAudio(url: string): Promise<string> {
 	const sc = new Soundcloud();
@@ -72,7 +76,7 @@ async function getPillowcaseAudio(url: string): Promise<string> {
 	return `https://api.pillowcase.su/api/get/${id}`;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
 	const { link, source, offset } = await SongToday();
 	let audioFile = "";
 
@@ -88,34 +92,53 @@ export async function GET() {
 				status: 500,
 			});
 	}
+	const duration = request.nextUrl.searchParams.get("duration");
+
+	console.log(audioFile);
 
 	try {
-		const audio = await fetch(audioFile, {
-			signal: AbortSignal.timeout(5000) // Give up after 5 seconds
-		});
-		const audioBuffer = await audio.arrayBuffer();
+		// Save file first to temp dir, speeds up ffmpeg processing
+		const tempFile = path.join(tmpdir(), "audio.mp3");
+		const res = await fetch(audioFile);
+		const buffer = Buffer.from(await res.arrayBuffer());
+		fs.writeFileSync(tempFile, buffer);
 
-		return new Response(audioBuffer, {
+		// Trim file down
+		const command = ffmpeg(tempFile)
+			.setStartTime(offset || 0)
+			.setDuration(duration || 32)
+			.audioCodec("libmp3lame")
+			.format("mp3");
+
+		const chunks: Uint8Array[] = []; // Buffer chunks to concatenate later
+
+		command.on("error", err => {
+			console.error(err);
+			throw new Response("FFMPEG_ERROR", { status: 500 });
+		});
+
+		// Pipe the output from ffmpeg to a stream
+		const stream = command.pipe();
+		stream.on("data", chunk => chunks.push(chunk));
+
+		// Wait for the stream to finish
+		await new Promise<void>((resolve, reject) => {
+			stream.on("end", resolve);
+			stream.on("error", reject);
+		});
+
+		// Add everything together, and send it
+		const finalBuffer = Buffer.concat(chunks);
+		return new Response(finalBuffer, {
 			headers: {
 				"Content-Type": "audio/mpeg",
-				"Content-Length": audioBuffer.byteLength.toString(),
+				"Content-Length": finalBuffer.length.toString(),
 				"X-Offset": offset ? offset.toString() : "",
 			}
-		})
-	} catch (err: any) {
-		if (err.name == "TimeoutError") { // AbortSignal throws this error
-			return new Response("API_TIMEOUT", {
-				status: 408,
-			})
-		} else if (err.name == "AbortError") { // Thrown if user clicks a "stop" button
-			return new Response("API_ABORTED", {
-				status: 418, // Is this is an appropriate use of this status code? No? But it's funny?
-			})
-		} else { // Catch-all
-			return new Response("API_UNKNOWN_ERROR", {
-				status: 500,
-			})
-		}
+		});
+	} catch (err) {
+		console.error(err);
+		throw new Response("API_UNKNOWN_ERROR", { status: 500 });
 	}
 }
 export const dynamic = 'force-dynamic';
