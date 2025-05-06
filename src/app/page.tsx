@@ -1,12 +1,6 @@
-import styles from "./page.module.css";
-import Navbar from "@/app/_components/(navbar)/navbar";
-import Game from "@/app/_components/(game)/game";
+import {redirect} from "next/navigation";
 
 export default function Home() {
-  return (
-    <main className={styles.main}>
-	    <Navbar />
-	    <Game />
-    </main>
-  );
-}
+    // temporary redirect to underscores until we have a proper home
+    redirect("/artists/underscores");
+};

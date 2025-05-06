@@ -17,25 +17,27 @@ const dateToday = () => {
 	return today.getDate() + "/" + (today.getMonth() + 1) + "/" + today.getFullYear();
 }
 
-export default function Game() {
+export default function Game({ artist } : { artist: any }) {
 	const [guesses, setGuesses] = useState<string[]>([])
 	const [complete, setComplete] = useState<boolean>(false);
 	const [songData, setSongData] = useState<SongData | null>(null);
 	const [doNotAutoplay, setDoNotAutoplay] = useState<boolean>(false);
-	const router = useRouter();
-	
+	// const router = useRouter();
+
+	console.log(artist);
+
 	useEffect(() => {
 		console.log("hello! welcome to the underscores heardle!");
-		
+
 		let history = window.localStorage.getItem("history");
 		if (!history) {
 			const newHistory: any = { };
 			window.localStorage.setItem("history", JSON.stringify(newHistory));
 			history = window.localStorage.getItem("history");
 		}
-		
+
 		const parsedHistory = JSON.parse(history!) as History;
-		
+
 		// Backwards compatibility
 		if (typeof Object.values(parsedHistory)[0] === "number") {
 			UpdateHistory(parsedHistory).then((newHistory) => {
@@ -44,7 +46,7 @@ export default function Game() {
 			});
 			return;
 		}
-		
+
 		if (!parsedHistory[dateToday()]) {
 			parsedHistory[dateToday()] = {};
 			window.localStorage.setItem("history", JSON.stringify(parsedHistory));
@@ -57,48 +59,48 @@ export default function Game() {
 			}
 		}
 	}, []);
-	
+
 	useEffect(() => {
 		IsGuessCorrect(guesses[guesses.length - 1]).then(async (result) => {
 			if (result || guesses.length > 6) await gameComplete();
 			else if (guesses.length == 6) { updateGuesses(""); } // Add a blank guess to signify the end of the game.
 		});
 	}, [guesses]);
-	
+
 	const guess = async (g: string) => {
 		updateGuesses(g);
 	}
-	
+
 	const skip = async () => {
 		updateGuesses("");
 	}
-	
+
 	const updateGuesses = (g: string) => {
 		const newGuesses = [...guesses, g];
 		setGuesses(newGuesses);
-		
+
 		const history = window.localStorage.getItem("history");
 		const parsed = JSON.parse(history!) as History;
 		parsed[dateToday()].guesses = newGuesses;
-		
+
 		window.localStorage.setItem("history", JSON.stringify(parsed));
 	}
-	
+
 	const gameComplete = async () => {
 		const songData= await SongToday();
-		
+
 		const history = window.localStorage.getItem("history");
 		const parsed = JSON.parse(history!) as History;
 		parsed[dateToday()].answer = songData.answer;
 		window.localStorage.setItem("history", JSON.stringify(parsed));
-		
+
 		// firing custom event (received in stats.tsx)
 		window.dispatchEvent(new Event("gameComplete"));
-		
+
 		setSongData(songData);
 		setComplete(true);
 	}
-	
+
 	return (
 		<>
 			{
