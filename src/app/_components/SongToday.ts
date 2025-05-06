@@ -1,5 +1,6 @@
 "use server";
 import { promises as fs } from "fs";
+import Artist from "@/../models/Artist";
 
 export type SongData = {
 	answer: string;
@@ -34,24 +35,26 @@ function shuffleArray<T>(array: T[], seed: number): T[] {
 	return newArray;
 }
 
-export async function SongToday(): Promise<SongData> {
+export async function SongToday(artist: string): Promise<SongData> {
 	if (!process.env.HARDLY_RANDOM_SEED) throw new Error("Environment not correctly set up.");
 	const seed = parseInt(process.env.HARDLY_RANDOM_SEED);
-	
-	const file = await fs.readFile(process.cwd() + "/src/app/songList.json", 'utf-8');
-	const songList = JSON.parse(file);
-	
+	if (!artist) throw new Error("No artist provided!");
+
+	const artistData = await Artist.findOne({ slug: artist });
+	if (!artistData) throw new Error("Artist not found!");
+	const songList = artistData.songs;
+
 	const totalSongs: number = songList.soundcloud.length + songList.tracker.length;
-	
+
 	const now = new Date();
 	const daysSinceEpoch = Math.floor(now.getTime() / 8.64e7); // idx for today
-	
+
 	const shuffleRound = Math.floor(daysSinceEpoch / totalSongs);
 	const shuffledList = shuffleArray([...songList.soundcloud, ...songList.tracker], seed + shuffleRound);
-	
+
 	const todayPick = shuffledList[daysSinceEpoch % totalSongs];
 	const source = (songList.soundcloud.indexOf(todayPick) > -1) ? "soundcloud" : "tracker";
-	
+
 	return {
 		answer: todayPick.answer,
 		link: todayPick.link,
@@ -61,7 +64,7 @@ export async function SongToday(): Promise<SongData> {
 }
 
 // Wrapper around the SongToday function to avoid spoiling the answer
-export async function IsGuessCorrect(guess: string): Promise<boolean> {
-	const song = await SongToday();
+export async function IsGuessCorrect(guess: string, artist: string): Promise<boolean> {
+	const song = await SongToday(artist);
 	return guess === song.answer;
 }

@@ -23,13 +23,16 @@ async function getPillowcaseAudio(url: string): Promise<string> {
 
 async function processAudioFile(audioFile: string, request: NextRequest): Promise<Buffer> {
 	// First, when was the last time we downloaded a song for this artist?
-	console.log(request.nextUrl.pathname);
+
 
 	return new Buffer(audioFile); // temp
 }
 
 export async function GET(request: NextRequest) {
-	const { link, source, offset } = await SongToday();
+	const artist = request.nextUrl.searchParams.get("artist");
+	if (artist === null) return new Response("No artist provided!", { status: 400 });
+
+	const { link, source, offset } = await SongToday(artist);
 	let audioFile = "";
 
 	switch (source) {

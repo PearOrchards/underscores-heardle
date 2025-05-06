@@ -7,13 +7,13 @@ import {useState, useRef, useEffect} from "react";
 import Dialog from "@/app/_components/(dialog)/dialog";
 import { SongToday } from "@/app/_components/SongToday";
 
-const audioLink = () => {
+const audioLink = (artist: string) => {
 	const now = new Date();
 	const str = now.toISOString().split("T")[0];
-	return `/api/audio?t=${str}`;
+	return `/api/audio?t=${str}&artist=${artist}`;
 }
 
-export default function Player({ currentAttempt, complete, doNotAutoplay } : { currentAttempt: number, complete: boolean, doNotAutoplay: boolean }) {
+export default function Player({ currentAttempt, complete, doNotAutoplay, artist } : { currentAttempt: number, complete: boolean, doNotAutoplay: boolean, artist: string })  {
 	// Player functionality states
 	const [ready, setReady] = useState<boolean>(false);
 	const [error, setError] = useState<string>("");
@@ -67,7 +67,7 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 	useEffect(() => {
 		if (audioRef.current) {
 			let tempOffset = 0;
-			fetch(audioLink())
+			fetch(audioLink(artist))
 				.then(r => {
 					if (r.ok) {
 						tempOffset = parseInt(r.headers.get("X-Offset") || "0") / 1000;
@@ -78,12 +78,12 @@ export default function Player({ currentAttempt, complete, doNotAutoplay } : { c
 					else {
 						if (r.status === 408) {
 							setError("Hang on! We can't connect to the API. You can either try again later or click this box to get the answer.")
-							SongToday().then((s) => setSong(s.answer));
+							SongToday(artist).then((s) => setSong(s.answer));
 						} else if (r.status === 418) {
 							setError("AH!!! You cut us off! Please reload and be patient!")
 						} else {
 							setError("Something went wrong... Please try again (later) or click this box to get the answer.")
-							SongToday().then(s => setSong(s.answer));
+							SongToday(artist).then(s => setSong(s.answer));
 						}
 						return null;
 					}
