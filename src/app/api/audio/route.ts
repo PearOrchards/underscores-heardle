@@ -8,6 +8,8 @@ import { SongToday } from "@/app/_components/SongToday";
 import Soundcloud from "soundcloud.ts";
 import ffmpeg from "fluent-ffmpeg";
 
+
+
 async function getSoundcloudTSAudio(url: string): Promise<string> {
 	const sc = new Soundcloud();
 	const track = await sc.tracks.get(url);
@@ -19,6 +21,13 @@ async function getSoundcloudTSAudio(url: string): Promise<string> {
 async function getPillowcaseAudio(url: string): Promise<string> {
 	const id = url.split("/").pop();
 	return `https://api.pillowcase.su/api/get/${id}`;
+}
+
+async function processAudioFile(audioFile: string, request: NextRequest): Promise<Buffer> {
+	// First, when was the last time we downloaded a song for this artist?
+	console.log(request.nextUrl.pathname);
+
+	return new Buffer(audioFile); // temp
 }
 
 export async function GET(request: NextRequest) {
@@ -40,6 +49,7 @@ export async function GET(request: NextRequest) {
 	const duration = request.nextUrl.searchParams.get("duration");
 
 	try {
+		await processAudioFile(audioFile, request);
 		// Save file first to temp dir, speeds up ffmpeg processing
 		const tempFile = path.join(tmpdir(), "audio.mp3");
 		const res = await fetch(audioFile);
