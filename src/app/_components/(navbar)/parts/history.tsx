@@ -11,22 +11,22 @@ export default function History() {
 	const [showHistoryModal, setShowHistoryModal] = useState<boolean>(false);
 	const [history, setHistory] = useState<any>();
 	const [selectedTitleElement, setSelectedTitleElement] = useState<string>("");
-	
+
 	const openHistoryModal = () => setShowHistoryModal(true);
 	const closeHistoryModal = () => setShowHistoryModal(false);
-	
+
 	const getHistory = () => {
 		const history = window.localStorage.getItem("history");
 		if (history) {
 			setHistory(JSON.parse(history));
 		}
 	}
-	
+
 	useEffect(() => {
 		getHistory();
 		window.addEventListener("gameComplete", getHistory); // custom event handler. fired in game.tsx
 	}, []);
-	
+
 	return (
 		<>
 			<button onClick={openHistoryModal}>
@@ -40,8 +40,8 @@ export default function History() {
 						<section className={styles.table}>
 							{
 								Object.entries(history).filter(([, data]: any) => data.guesses).map(([date, data]: any) => (
-									<>
-										<div key={date} className={styles.title} onClick={() => setSelectedTitleElement(date)}>
+									<div key={date}>
+										<div className={styles.title} onClick={() => setSelectedTitleElement(date)}>
 											<p className={styles.date}>{date}</p>
 											<p className={styles.data}>{data.answer}</p>
 										</div>
@@ -52,7 +52,7 @@ export default function History() {
 												))
 											}
 										</div>
-									</>
+									</div>
 								))
 							}
 						</section>
