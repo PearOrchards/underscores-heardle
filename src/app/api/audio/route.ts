@@ -1,19 +1,20 @@
 import { NextRequest } from "next/server";
 import { tmpdir } from "os";
 import path from "node:path";
-import { writeFileSync } from "node:fs";
+import { writeFileSync, existsSync } from "node:fs";
 
 import { SongToday } from "@/app/_components/SongToday";
 
 import Soundcloud from "soundcloud.ts";
 import ffmpeg from "fluent-ffmpeg";
+import Artist from "@/../models/Artist";
 
 async function getSoundcloudTSAudio(url: string): Promise<string> {
 	const sc = new Soundcloud();
 	const track = await sc.tracks.get(url);
 	if (!track) return ""; // No track found, so no audio
 
-	return sc.util.streamLink(url, "progressive");
+	return await sc.util.streamLink(url, "progressive");
 }
 
 async function getPillowcaseAudio(url: string): Promise<string> {
@@ -21,15 +22,68 @@ async function getPillowcaseAudio(url: string): Promise<string> {
 	return `https://api.pillowcase.su/api/get/${id}`;
 }
 
-async function processAudioFile(audioFile: string, request: NextRequest): Promise<Buffer> {
+/**
+ * Processes an audio file by downloading it and trimming it to the specified offset and duration.
+ * @param audioFile - The URL of the audio file to process.
+ * @param slug - The slug of the artist to associate with the audio file.
+ * @param offset - Seconds to start the audio from. Leave undefined to start from the beginning.
+ * @param duration - Duration of the audio in seconds. Leave undefined to get the whole file.
+ */
+async function processAudioFile(audioFile: string, slug: string, offset?: number, duration?: number): Promise<Buffer> {
 	// First, when was the last time we downloaded a song for this artist?
+	const artist = await Artist.findOne({ slug });
+	if (!artist) throw new Error("How have we got here with NO ARTIST!?");
 
+	const tempFile = path.join(tmpdir(), `${btoa(slug)}.mp3`);
+	const midnight = new Date();
+	midnight.setUTCHours(0, 0, 0, 0);
 
-	return new Buffer(audioFile); // temp
+	// Has it been accessed today, or does the file not even exist?
+	if (!existsSync(tempFile) || !artist.lastAccessed || artist.lastAccessed < midnight.getTime()) {
+		// If not, it needs to be downloaded.
+		const res = await fetch(audioFile);
+		if (!res.ok) throw new Error("Failed to fetch audio from remote.");
+
+		const buffer = Buffer.from(await res.arrayBuffer());
+		writeFileSync(tempFile, buffer);
+	}
+
+	// Update the last accessed date
+	artist.lastAccessed = Date.now();
+	await artist.save();
+
+	// Trim file down
+	const command = ffmpeg(tempFile)
+		.setStartTime(offset || 0)
+		.setDuration(duration || 999)
+		.audioCodec("libmp3lame")
+		.audioBitrate("96k")
+		.format("mp3");
+
+	const chunks: Uint8Array[] = []; // Buffer chunks to concatenate later
+
+	command.on("error", err => {
+		console.error(err);
+		throw new Response("FFMPEG_ERROR", { status: 500 });
+	});
+
+	// Pipe the output from ffmpeg to a stream
+	const stream = command.pipe();
+	stream.on("data", chunk => chunks.push(chunk));
+
+	// Wait for the stream to finish
+	await new Promise<void>((resolve, reject) => {
+		stream.on("end", resolve);
+		stream.on("error", reject);
+	});
+
+	// Add everything together, and send it
+	return Buffer.concat(chunks);
 }
 
 export async function GET(request: NextRequest) {
 	const artist = request.nextUrl.searchParams.get("artist");
+	const duration = request.nextUrl.searchParams.get("duration");
 	if (artist === null) return new Response("No artist provided!", { status: 400 });
 
 	const { link, source, offset } = await SongToday(artist);
@@ -47,42 +101,9 @@ export async function GET(request: NextRequest) {
 				status: 500,
 			});
 	}
-	const duration = request.nextUrl.searchParams.get("duration");
 
 	try {
-		await processAudioFile(audioFile, request);
-		// Save file first to temp dir, speeds up ffmpeg processing
-		const tempFile = path.join(tmpdir(), "audio.mp3");
-		const res = await fetch(audioFile);
-		const buffer = Buffer.from(await res.arrayBuffer());
-		writeFileSync(tempFile, buffer);
-
-		// Trim file down
-		const command = ffmpeg(tempFile)
-			.setStartTime(offset || 0)
-			.setDuration(duration || 32)
-			.audioCodec("libmp3lame")
-			.format("mp3");
-
-		const chunks: Uint8Array[] = []; // Buffer chunks to concatenate later
-
-		command.on("error", err => {
-			console.error(err);
-			throw new Response("FFMPEG_ERROR", { status: 500 });
-		});
-
-		// Pipe the output from ffmpeg to a stream
-		const stream = command.pipe();
-		stream.on("data", chunk => chunks.push(chunk));
-
-		// Wait for the stream to finish
-		await new Promise<void>((resolve, reject) => {
-			stream.on("end", resolve);
-			stream.on("error", reject);
-		});
-
-		// Add everything together, and send it
-		const finalBuffer = Buffer.concat(chunks);
+		const finalBuffer = await processAudioFile(audioFile, artist, offset || 0, Number(duration));
 		return new Response(finalBuffer, {
 			headers: {
 				"Content-Type": "audio/mpeg",

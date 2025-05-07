@@ -10,6 +10,7 @@ export interface Artists extends mongoose.Document {
     slug: string;
     displayName: string;
     colour: string;
+    lastAccessed: Date;
     songs: {
         soundcloud: SongData[];
         tracker: SongData[];
@@ -36,6 +37,7 @@ const ArtistSchema = new mongoose.Schema<Artists>({
         /* Accent colour */
         type: String,
     },
+    lastAccessed: Date,
     songs: {
         /* List of songs by the artist */
         soundcloud: {

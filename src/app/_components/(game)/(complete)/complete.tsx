@@ -32,6 +32,7 @@ export default function Complete({ songData, guesses, artist } : { songData: Son
 	const [ts, setTS] = useState<number>(0);
 	const [us, setUS] = useState<number>(0);
 
+	// TODO: Make this use UTC. As well as everything else.
 	const tomorrow = new Date();
 	tomorrow.setDate(tomorrow.getDate() + 1);
 	tomorrow.setHours(0, 0, 0, 0);

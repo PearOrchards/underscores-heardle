@@ -7,10 +7,10 @@ import {useState, useRef, useEffect} from "react";
 import Dialog from "@/app/_components/(dialog)/dialog";
 import { SongToday } from "@/app/_components/SongToday";
 
-const audioLink = (artist: string) => {
+const audioLink = (artist: string, duration?: number) => {
 	const now = new Date();
 	const str = now.toISOString().split("T")[0];
-	return `/api/audio?t=${str}&artist=${artist}`;
+	return `/api/audio?t=${str}&artist=${artist}` + (duration ? `&duration=${duration}` : "");
 }
 
 export default function Player({ currentAttempt, complete, doNotAutoplay, artist } : { currentAttempt: number, complete: boolean, doNotAutoplay: boolean, artist: string })  {
@@ -67,7 +67,8 @@ export default function Player({ currentAttempt, complete, doNotAutoplay, artist
 	useEffect(() => {
 		if (audioRef.current) {
 			let tempOffset = 0;
-			fetch(audioLink(artist))
+			// TODO: stop the previous audio if it's playing and restart it after fetch.
+			fetch(audioLink(artist, Math.pow(2, currentAttempt)))
 				.then(r => {
 					if (r.ok) {
 						tempOffset = parseInt(r.headers.get("X-Offset") || "0") / 1000;
@@ -101,7 +102,7 @@ export default function Player({ currentAttempt, complete, doNotAutoplay, artist
 				setDisplayedTime(Math.floor(audioRef.current?.currentTime || 0));
 			});
 		}
-	}, []);
+	}, [artist, currentAttempt]);
 
 	useEffect(() => {
 		if (complete && audioRef.current && !doNotAutoplay) {
