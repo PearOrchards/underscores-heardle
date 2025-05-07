@@ -2,7 +2,6 @@ import { SongToday } from "@/app/_components/SongToday";
 import { type NextRequest } from "next/server";
 import path from "node:path";
 import { readFileSync } from "node:fs";
-import { getSoundcloudToken, createAccess } from "@/app/_components/AuthSoundcloud";
 import Soundcloud from "soundcloud.ts";
 
 async function getSoundcloudCoverTS(url: string): Promise<string> {
