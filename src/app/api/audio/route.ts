@@ -1,9 +1,9 @@
-import { NextRequest } from "next/server";
-import { tmpdir } from "os";
+import {NextRequest} from "next/server";
+import {tmpdir} from "os";
 import path from "node:path";
-import { writeFileSync, existsSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 
-import { SongToday } from "@/app/_components/SongToday";
+import {SongToday} from "@/app/_components/SongToday";
 
 import Soundcloud from "soundcloud.ts";
 import ffmpeg from "fluent-ffmpeg";
@@ -46,16 +46,37 @@ async function processAudioFile(audioFile: string, slug: string, offset?: number
 
 		const buffer = Buffer.from(await res.arrayBuffer());
 		writeFileSync(tempFile, buffer);
+
+		// Delete any old cut tracks in the temp directory
+		readdirSync(tmpdir()).forEach(file => {
+			if (file.match(new RegExp(`^${btoa(slug)}-\\d+\\.mp3$`))) {
+				unlinkSync(path.join(tmpdir(), file));
+			}
+		});
 	}
 
 	// Update the last accessed date
 	artist.lastAccessed = Date.now();
 	await artist.save();
 
+	// If there's no duration, just return the whole thing
+	if (!duration) {
+		console.log(`Returning full file for ${slug}`);
+		return readFileSync(tempFile);
+	}
+	// Else, is there a file with the duration already?
+	const durationTempFile = path.join(tmpdir(), `${btoa(slug)}-${duration}.mp3`);
+	if (existsSync(durationTempFile)) {
+		console.log(`Returning cached file for ${slug} (${duration}s)`);
+		return readFileSync(durationTempFile);
+	}
+	// If not, we need to trim it down
+	console.log(`Creating ${slug}-${duration}s file...`);
+
 	// Trim file down
 	const command = ffmpeg(tempFile)
 		.setStartTime(offset || 0)
-		.setDuration(duration || 999)
+		.setDuration(duration)
 		.audioCodec("libmp3lame")
 		.audioBitrate("96k")
 		.format("mp3");
@@ -78,7 +99,12 @@ async function processAudioFile(audioFile: string, slug: string, offset?: number
 	});
 
 	// Add everything together, and send it
-	return Buffer.concat(chunks);
+	const finalBuffer = Buffer.concat(chunks);
+
+	// Save the file to the temp directory
+	writeFileSync(durationTempFile, finalBuffer);
+
+	return finalBuffer;
 }
 
 export async function GET(request: NextRequest) {
