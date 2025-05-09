@@ -67,7 +67,14 @@ export default function Player({ currentAttempt, complete, doNotAutoplay, artist
 	useEffect(() => {
 		if (audioRef.current) {
 			let tempOffset = 0;
-			// TODO: stop the previous audio if it's playing and restart it after fetch.
+
+			// Is audio currently playing?
+			let wasPlayingOnAudioUpdate = false;
+			if (playing) {
+				stop();
+				wasPlayingOnAudioUpdate = true;
+			}
+
 			fetch(audioLink(artist, Math.pow(2, currentAttempt)))
 				.then(r => {
 					if (r.ok) {
@@ -94,6 +101,8 @@ export default function Player({ currentAttempt, complete, doNotAutoplay, artist
 						audioRef.current.src = URL.createObjectURL(new Blob([buffer], {type: "audio/mpeg"}));
 						audioRef.current.currentTime = tempOffset;
 						setReady(true);
+
+						if (wasPlayingOnAudioUpdate) play();
 					}
 				});
 			// End of fetch
