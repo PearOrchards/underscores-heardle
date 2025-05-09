@@ -75,7 +75,8 @@ export default function Player({ currentAttempt, complete, doNotAutoplay, artist
 				wasPlayingOnAudioUpdate = true;
 			}
 
-			fetch(audioLink(artist, Math.pow(2, currentAttempt)))
+			const link = currentAttempt <= 6 ? audioLink(artist, Math.pow(2, currentAttempt)) : audioLink(artist);
+			fetch(link)
 				.then(r => {
 					if (r.ok) {
 						tempOffset = parseInt(r.headers.get("X-Offset") || "0") / 1000;
