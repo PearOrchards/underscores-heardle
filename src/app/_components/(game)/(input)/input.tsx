@@ -1,28 +1,28 @@
 import styles from "./input.module.scss";
-import { songs } from "./songs";
+import { SongSuggestions } from "./SongSuggestions";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faXmark } from "@fortawesome/free-solid-svg-icons";
 
 import { useState, useRef } from "react";
 
-export default function Input({ currentAttempt, complete, guess, skip } : { currentAttempt: number, complete: boolean, guess: (g: string) => void, skip: () => void }) {
+export default function Input({ currentAttempt, complete, guess, skip, artist } : { currentAttempt: number, complete: boolean, guess: (g: string) => void, skip: () => void, artist: string }) {
 	const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
 	const [suggestions, setSuggestions] = useState<string[]>([]);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const suggestionsRef = useRef<HTMLDivElement>(null);
-	
+
 	const clear = () => {
 		if (inputRef.current) inputRef.current.value = "";
 	}
 	const autocomplete = (suggestion: string) => {
 		if (inputRef.current) inputRef.current.value = suggestion;
 	}
-	
+
 	const onFocus = async () => {
 		const stringToCheck = inputRef.current?.value;
 		if (stringToCheck) {
-			const suggestions = await songs(inputRef.current?.value || "");
+			const suggestions = await SongSuggestions(artist, inputRef.current?.value || "");
 			setSuggestions(suggestions);
 			setShowSuggestions(true);
 		}
@@ -34,18 +34,18 @@ export default function Input({ currentAttempt, complete, guess, skip } : { curr
 			suggestionsRef.current?.querySelector(`.${styles.selected}`)?.classList.remove(styles.selected);
 		}, 100);
 	}
-	
+
 	const submitGuess = async () => {
 		if (!inputRef.current) return;
 		const value = inputRef.current.value;
-		const allSongs = await songs("");
-		
+		const allSongs = await SongSuggestions(artist,"");
+
 		if (allSongs.includes(value)) {
 			guess(value);
 			clear();
 		}
 	}
-	
+
 	const keyPress = (ev: React.KeyboardEvent<HTMLInputElement>) => {
 		if (ev.key === "ArrowUp" || ev.key === "ArrowDown") {
 			ev.preventDefault();
@@ -81,7 +81,7 @@ export default function Input({ currentAttempt, complete, guess, skip } : { curr
 			blur();
 		}
 	}
-	
+
 	const hover = (ev: React.MouseEvent<HTMLParagraphElement>) => {
 		const suggestions = suggestionsRef.current?.querySelectorAll("p");
 		if (suggestions) {
@@ -89,7 +89,7 @@ export default function Input({ currentAttempt, complete, guess, skip } : { curr
 			ev.currentTarget.classList.add(styles.selected);
 		}
 	}
-	
+
 	return !complete ? (
 		<section>
 			<form className={styles.input} onSubmit={async (ev) => { ev.preventDefault(); await submitGuess() }}>

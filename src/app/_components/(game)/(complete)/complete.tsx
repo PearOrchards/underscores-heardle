@@ -12,50 +12,50 @@ import Dialog from "@/app/_components/(dialog)/dialog";
 
 const completionMessages = ["how???", "amazing!", "great job!", "nice!", "alright!", "close one!", "unlucky..."]
 
-const coverLink = () => {
+const coverLink = (artist: string) => {
 	const now = new Date();
 	const str = now.toISOString().split("T")[0];
-	return `/api/cover?t=${str}`;
+	return `/api/cover?t=${str}&artist=${artist}`;
 }
 
-export default function Complete({ songData, guesses } : { songData: SongData | null, guesses: string[] }) {
+export default function Complete({ songData, guesses, artist } : { songData: SongData | null, guesses: string[], artist: string }) {
 	const [copiedSuccessfully, setCopiedSuccessfully] = useState<boolean>(false);
 	const [manualCopy, setManualCopy] = useState<string>("");
 	const [modalOpen, setModalOpen] = useState<boolean>(false);
 	const openCopyModal = () => setModalOpen(true);
 	const closeCopyModal = () => setModalOpen(false);
-	
+
 	const [th, setTH] = useState<number>(0);
 	const [uh, setUH] = useState<number>(0);
 	const [tm, setTM] = useState<number>(0);
 	const [um, setUM] = useState<number>(0);
 	const [ts, setTS] = useState<number>(0);
 	const [us, setUS] = useState<number>(0);
-	
+
 	const tomorrow = new Date();
-	tomorrow.setDate(tomorrow.getDate() + 1);
-	tomorrow.setHours(0, 0, 0, 0);
-	
+	tomorrow.setUTCDate(tomorrow.getDate() + 1);
+	tomorrow.setUTCHours(0, 0, 0, 0);
+
 	const bars = [];
 	for (let i = 0; i < 6; i++) {
 		let secondaryClass = null;
-		
+
 		if (guesses[i] === songData?.answer) secondaryClass = styles.correct;
 		else if (guesses[i]) secondaryClass = styles.wrong;
 		else if (guesses[i] === "") secondaryClass = styles.skip;
 		else secondaryClass = "";
-		
+
 		bars.push(<div key={i + 6} className={`${styles.attemptBlock} ${secondaryClass}`}></div>)
 	}
-	
+
 	setInterval(()=> {
 		const now = new Date();
 		const diff = tomorrow.getTime() - now.getTime();
-		
+
 		const hours = Math.floor(diff / (1000 * 60 * 60));
 		const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 		const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-		
+
 		setTH(Math.floor(hours / 10));
 		setUH(hours % 10);
 		setTM(Math.floor(minutes / 10));
@@ -63,9 +63,9 @@ export default function Complete({ songData, guesses } : { songData: SongData | 
 		setTS(Math.floor(seconds / 10));
 		setUS(seconds % 10);
 	}, 1000);
-	
+
 	const share = async () => {
-		let clipboardData = `underscores heardle #${await HeardleNumber()}\n\n🔊`;
+		let clipboardData = `${artist} heardle #${await HeardleNumber()}\n\n🔊`;
 		for (let i = 0; i < 6; i++) {
 			if (guesses[i] === songData?.answer) clipboardData += `🟩`;
 			else if (guesses[i]) clipboardData += `🟥`;
@@ -73,7 +73,7 @@ export default function Complete({ songData, guesses } : { songData: SongData | 
 			else clipboardData += `⬛`;
 		}
 		clipboardData += `\n\n🔗 ${window.location.href}`;
-		
+
 		try {
 			navigator.clipboard.writeText(clipboardData).then(() => { // Success!
 				setCopiedSuccessfully(true);
@@ -88,12 +88,12 @@ export default function Complete({ songData, guesses } : { songData: SongData | 
 			openCopyModal();
 		}
 	}
-	
+
 	return (
 		<section className={styles.complete} data-cy="complete">
 			<div className={styles.topBox}>
 				<div className={styles.leftBlock}>
-					<Image src={coverLink()} width={250} height={250} alt="Album cover" />
+					<Image src={coverLink(artist)} width={250} height={250} alt="Album cover" />
 					<span>
 						<p>underscores</p>
 						<p>{songData?.answer}</p>
