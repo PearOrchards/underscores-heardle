@@ -1,11 +1,11 @@
 "use server";
-import Artist from "@/../models/Artist";
+import prisma from "@/lib/prisma";
 
 export type SongData = {
 	answer: string;
 	link: string;
 	source: string;
-	offset?: number;
+	offset: number | null;
 }
 
 /*
@@ -39,7 +39,7 @@ export async function SongToday(artist: string): Promise<SongData> {
 	const seed = parseInt(process.env.HARDLY_RANDOM_SEED);
 	if (!artist) throw new Error("No artist provided!");
 
-	const artistData = await Artist.findOne({ slug: artist });
+	const artistData = await prisma.artists.findUnique({ where: { slug: artist } });
 	if (!artistData) throw new Error("Artist not found!");
 	const songList = artistData.songs;
 

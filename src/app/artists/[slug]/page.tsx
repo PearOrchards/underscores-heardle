@@ -1,11 +1,12 @@
 import styles from "./page.module.css";
 import Navbar from "@/app/_components/(navbar)/navbar";
 import Game from "@/app/_components/(game)/game";
-import Artist from "@/../models/Artist";
+
+import prisma from "@/lib/prisma";
 
 export default async function GameHome({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const artist = await Artist.findOne({ slug });
+    const artist = await prisma.artists.findUnique({ where: { slug } })
 
     if (!artist) {
         throw new Error(`No artist found from "${slug}"`);
