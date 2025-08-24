@@ -6,7 +6,7 @@ import prisma from "@/lib/prisma";
 
 export default async function GameHome({ params }: { params: Promise<{ slug: string }> }) {
     const { slug } = await params;
-    const artist = await prisma.artists.findUnique({ where: { slug } })
+    const artist = await prisma.artists.findUnique({ where: { slug } });
 
     if (!artist) {
         throw new Error(`No artist found from "${slug}"`);

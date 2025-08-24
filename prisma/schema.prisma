@@ -30,11 +30,12 @@ model Artists {
   colour       String
   displayName  String
   lastAccessed DateTime     @db.Date
-  slug         String       @unique(map: "slug_1")
+  slug         String       @unique(map: "slug")
   songs        ArtistsSongs
 
-  @@unique([songs.soundcloud.link], map: "songs.soundcloud.link_1")
-  @@unique([songs.tracker.link], map: "songs.tracker.link_1")
+  @@unique([songs.soundcloud.link], map: "songs.soundcloud.link")
+  @@unique([songs.tracker.link], map: "songs.tracker.link")
+  @@map("artists")
 }
 
 // Auth.js models
