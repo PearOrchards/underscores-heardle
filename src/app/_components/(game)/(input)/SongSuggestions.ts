@@ -1,9 +1,10 @@
 "use server";
-import Artist from "@/../models/Artist";
+import prisma from "@/lib/prisma";
 
 export async function SongSuggestions(artist: string, query: string): Promise<string[]> {
 	if (!artist) throw new Error("No artist provided!");
-	const artistData = await Artist.findOne({ slug: artist });
+	const artistData = await prisma.artists.findUnique({ where: { slug: artist } });
+	if (!artistData) throw new Error("No artist found!");
 	const songList = artistData.songs;
 
 	const songNames = [ ...songList.soundcloud.map((song: any) => song.answer),
