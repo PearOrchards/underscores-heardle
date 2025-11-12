@@ -19,7 +19,7 @@ async function getSoundcloudTSAudio(url: string): Promise<string> {
 
 async function getPillowcaseAudio(url: string): Promise<string> {
 	const id = url.split("/").pop();
-	return `https://api.pillowcase.su/api/get/${id}`;
+	return `https://api.pillows.su/api/get/${id}.ogg`;
 }
 
 /**
