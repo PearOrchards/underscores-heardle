@@ -24,6 +24,9 @@ export default function Login() {
       />
       <Dialog isOpen={showLoginModal} onClose={closeLoginModal}>
         <h2>login</h2>
+        <p style={{ paddingBottom: "0" }}>
+          You can sync your game data and stuff across devices now.
+        </p>
         <div>
           <button
             className={loginStyles.google}
@@ -38,6 +41,16 @@ export default function Login() {
             Sign in with Google
           </button>
         </div>
+        <p
+          style={{
+            fontSize: "0.875rem",
+            paddingTop: "1rem",
+            opacity: "0.75",
+          }}
+        >
+          Side note: Signing in with other services makes you applicable to
+          their Terms and Privacy Notices.
+        </p>
       </Dialog>
     </>
   );
