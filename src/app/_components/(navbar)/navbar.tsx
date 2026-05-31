@@ -1,3 +1,5 @@
+"use client";
+
 import styles from "./navbar.module.scss";
 
 import Help from "./parts/help";

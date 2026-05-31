@@ -1,6 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Rethink_Sans } from "next/font/google";
+import { getServerSession } from "next-auth";
 import "./globals.css";
+
+import { authOptions } from "@/lib/auth";
+import Providers from "./_components/providers";
 
 const rethinkSans = Rethink_Sans({ subsets: ["latin"] });
 
@@ -34,12 +38,16 @@ export const viewport: Viewport = {
   themeColor: "#222",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const session = await getServerSession(authOptions);
+
   return (
     <html lang="en">
-      <body className={rethinkSans.className}>{children}</body>
+      <body className={rethinkSans.className}>
+        <Providers session={session}>{children}</Providers>
+      </body>
     </html>
   );
 }
