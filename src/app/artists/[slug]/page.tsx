@@ -4,21 +4,25 @@ import Game from "@/app/_components/(game)/game";
 
 import prisma from "@/lib/prisma";
 
-export default async function GameHome({ params }: { params: Promise<{ slug: string }> }) {
-    const { slug } = await params;
-    const artist = await prisma.artists.findUnique({ where: { slug } });
+export default async function GameHome({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = await params;
+  const artist = await prisma.artists.findUnique({ where: { slug } });
 
-    if (!artist) {
-        throw new Error(`No artist found from "${slug}"`);
-    }
+  if (!artist) {
+    throw new Error(`No artist found from "${slug}"`);
+  }
 
-    // const artistData = artist.toObject();
-    // artistData._id = artistData._id.toString();
+  // const artistData = artist.toObject();
+  // artistData._id = artistData._id.toString();
 
-    return (
-        <main className={styles.main}>
-            <Navbar display={artist.displayName} />
-            <Game artist={artist.slug} />
-        </main>
-    );
+  return (
+    <main className={styles.main}>
+      <Navbar display={artist.displayName} />
+      <Game artist={artist.slug} />
+    </main>
+  );
 }

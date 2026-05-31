@@ -1,35 +1,35 @@
 .attemptBox {
-	width: 40vw;
-	height: 3rem;
+    width: 40vw;
+    height: 3rem;
 
-	margin: 1rem auto;
-	padding: .5rem;
+    margin: 1rem auto;
+    padding: 0.5rem;
 
-	border: 2px solid var(--foreground-secondary);
-	overflow: clip;
+    border: 2px solid var(--foreground-secondary);
+    overflow: clip;
 
-	& p {
-		font-size: 1.5rem;
-		color: var(--foreground-secondary);
+    & p {
+        font-size: 1.5rem;
+        color: var(--foreground-secondary);
 
-		& span {
-			margin-left: .25rem;
-		}
-	}
+        & span {
+            margin-left: 0.25rem;
+        }
+    }
 
-	&.active {
-		background-color: var(--background-secondary);
-		border-color: var(--foreground);
-	}
+    &.active {
+        background-color: var(--background-secondary);
+        border-color: var(--foreground);
+    }
 }
 
 @media screen and (max-width: 1100px) {
-	.attemptBox {
-		width: 80vw;
-		height: 4rem;
+    .attemptBox {
+        width: 80vw;
+        height: 4rem;
 
-		& p {
-			font-size: 2rem;
-		}
-	}
+        & p {
+            font-size: 2rem;
+        }
+    }
 }
