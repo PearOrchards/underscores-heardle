@@ -8,5 +8,6 @@ allowBuilds:
   "@parcel/watcher": true
   cypress: true
   ffmpeg-static: true
+  msw: true
   sharp: true
   unrs-resolver: true

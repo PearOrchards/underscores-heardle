@@ -1,43 +1,60 @@
-import type {Metadata, Viewport} from "next";
-import {Rethink_Sans} from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Rethink_Sans, Figtree, Montserrat } from "next/font/google";
 import "./globals.css";
 
-const rethinkSans = Rethink_Sans({subsets: ["latin"]});
+const rethinkSans = Rethink_Sans({ subsets: ["latin"] });
 
 // Import to stop flash of very large icon.
-import '@fortawesome/fontawesome-svg-core/styles.css';
+import "@fortawesome/fontawesome-svg-core/styles.css";
 // Now stop fontawesome from doing that itself.
-import {config} from '@fortawesome/fontawesome-svg-core';
+import { config } from "@fortawesome/fontawesome-svg-core";
+import { cn } from "@/lib/utils";
+
+const montserratHeading = Montserrat({
+  subsets: ["latin"],
+  variable: "--font-heading",
+});
+
+const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
 
 config.autoAddCss = false;
 
 export const metadata: Metadata = {
-	title: "underscores heardle",
-	description: "a heardle game with underscores stuff. inspired by heardle.apictureof.me",
-	openGraph: {
-		title: "underscores heardle",
-		description: "a heardle game with underscores stuff. inspired by heardle.apictureof.me",
-		url: process.env.URL,
-		locale: "en_GB",
-		type: "website",
-	},
-	twitter: {
-		creator: "@pearorchards_",
-		card: "summary_large_image"
-	},
-	metadataBase: new URL(process.env.URL || ""),
+  title: "underscores heardle",
+  description:
+    "a heardle game with underscores stuff. inspired by heardle.apictureof.me",
+  openGraph: {
+    title: "underscores heardle",
+    description:
+      "a heardle game with underscores stuff. inspired by heardle.apictureof.me",
+    url: process.env.URL,
+    locale: "en_GB",
+    type: "website",
+  },
+  twitter: {
+    creator: "@pearorchards_",
+    card: "summary_large_image",
+  },
+  metadataBase: new URL(process.env.URL || ""),
 };
 
 export const viewport: Viewport = {
-	themeColor: "#222",
-}
+  themeColor: "#222",
+};
 
-export default function RootLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
-	return (
-		<html lang="en">
-			<body className={rethinkSans.className}>
-				{children}
-			</body>
-		</html>
-	);
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html
+      lang="en"
+      className={cn(
+        "font-sans max-w-screen overflow-x-hidden",
+        figtree.variable,
+        montserratHeading.variable,
+      )}
+    >
+      <body className={rethinkSans.className}>{children}</body>
+    </html>
+  );
 }

@@ -1,126 +1,127 @@
 "use client";
-import styles from "./stats.module.scss";
-
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faChartSimple } from "@fortawesome/free-solid-svg-icons";
 
 import { useEffect, useState } from "react";
 
-import Dialog from "@/app/_components/(dialog)/dialog";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/app/_components/ui/dialog";
+import { Icon } from "@/app/_components/ui/icon";
 import History from "./history";
 
 interface Stats {
-	played: number;
-	won: number;
-	currentStreak: number;
-	bestStreak: number;
-	distribution: number[];
+  played: number;
+  won: number;
+  winRate: string;
+  currentStreak: number;
+  bestStreak: number;
+  distribution: number[];
 }
 
+type KeyState = keyof Omit<Stats, "distribution">;
+
+const StatsKeyDescriptions = {
+  played: "played",
+  won: "won",
+  winRate: "win rate",
+  currentStreak: "current streak",
+  bestStreak: "best streak",
+  distribution: "distribution",
+} as Record<KeyState, string>;
+
 export default function Stats() {
-	const [showStatsModal, setShowStatsModal] = useState<boolean>(false);
-	const [stats, setStats] = useState<Stats>();
-	
-	const openStatsModal = () => setShowStatsModal(true);
-	const closeStatsModal = () => setShowStatsModal(false);
-	
-	const updateStats = () => {
-		const history = window.localStorage.getItem("history");
-		if (history) {
-			const parsed = JSON.parse(history);
-			let played = 0;
-			let won = 0;
-			let currentStreak = 0;
-			let bestStreak = 0;
-			const distribution = [0, 0, 0, 0, 0, 0, 0];
-			
-			Object.entries(parsed).forEach(([date, data]: any) => {
-				played++
-				if (data.guesses) {
-					distribution[data.guesses.length - 1]++;
-					if (data.guesses.length >= 7) currentStreak = 0;
-					else {
-						won++;
-						currentStreak++;
-						if (currentStreak > bestStreak) bestStreak = currentStreak;
-					}
-				}
-			});
-			
-			setStats({
-				played,
-				won,
-				currentStreak,
-				bestStreak,
-				distribution
-			});
-		}
-	}
-	
-	useEffect(() => {
-		updateStats();
-		window.addEventListener("gameComplete", updateStats); // custom event handler. fired in game.tsx
-	}, []);
-	
-	return (
-		<>
-			<FontAwesomeIcon icon={faChartSimple} className={styles.fa} onClick={openStatsModal} />
-			<Dialog isOpen={showStatsModal} onClose={closeStatsModal}>
-				<h2>stats</h2>
-				<div className={styles.statsContainer}>
-					<div className={styles.charts}>
-						{  stats?.distribution ? stats.distribution.map((data: number, itr: number) => {
-							return <div className={styles.chartGroup} key={itr}>
-								<p>{data}</p>
-								<div className={styles.chart} style={{ height: `${(data * 200) / stats.played}px` }}></div>
-								<p>{itr === 6 ? "x" : itr + 1}</p>
-							</div>
-						}) : null }
-					</div>
-					<div>
-						<div className={styles.data}>
-							{stats ? (
-								<>
-									<p>
-										{stats.played}
-										<br/>
-										<span className={styles.dataDescriptor}>played</span>
-									</p>
-									<p>
-										{stats.won}
-										<br/>
-										<span className={styles.dataDescriptor}>won</span>
-									</p>
-									<p>
-										{((stats.won / stats.played) * 100).toFixed(2)}%
-										<br/>
-										<span className={styles.dataDescriptor}>win rate</span>
-									</p>
-								</>
-							) : (<p>nothing!</p>)
-							}
-						</div>
-						<div className={styles.data}>
-							{stats ? (
-								<>
-									
-									<p>
-										{stats.currentStreak}
-										<br/>
-										<span className={styles.dataDescriptor}>current streak</span>
-									</p>
-									<p>
-										{stats.bestStreak}
-										<br/>
-										<span className={styles.dataDescriptor}>best streak</span>
-									</p>
-								</>
-							) : null}
-						</div>
-						<History />
-					</div>
-				</div>
-			</Dialog>
-		</>
-	)
+  const [stats, setStats] = useState<Stats>();
+
+  const updateStats = () => {
+    const history = window.localStorage.getItem("history");
+    if (history) {
+      const parsed = JSON.parse(history);
+      let played = 0;
+      let won = 0;
+      let currentStreak = 0;
+      let bestStreak = 0;
+      const distribution = [0, 0, 0, 0, 0, 0, 0];
+
+      Object.entries(parsed).forEach(([date, data]: any) => {
+        played++;
+        if (data.guesses) {
+          distribution[data.guesses.length - 1]++;
+          if (data.guesses.length >= 7) currentStreak = 0;
+          else {
+            won++;
+            currentStreak++;
+            if (currentStreak > bestStreak) bestStreak = currentStreak;
+          }
+        }
+      });
+
+      setStats({
+        played,
+        won,
+        winRate: `${played > 0 ? Math.round((won / played) * 100) : 0}%`,
+        currentStreak,
+        bestStreak,
+        distribution,
+      });
+    }
+  };
+
+  useEffect(() => {
+    updateStats();
+    window.addEventListener("gameComplete", updateStats); // custom event handler. fired in game.tsx
+  }, []);
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Icon name="ChartNoAxesColumn" />
+      </DialogTrigger>
+      <DialogContent className="lg:w-1/3">
+        <DialogTitle>stats</DialogTitle>
+        <DialogDescription className="flex flex-col">
+          <div className="flex flex-row flex-nowrap justify-center items-end gap-2">
+            {stats?.distribution
+              ? stats.distribution.map((data: number, itr: number) => {
+                  return (
+                    <div className="mb-0" key={itr}>
+                      <p className="text-base text-center mt-1 mx-auto mb-0 p-0">
+                        {data}
+                      </p>
+                      <div
+                        className="mb-0 w-8 min-h-2.5 bg-foreground-secondary"
+                        style={{ height: `${(data * 200) / stats.played}px` }}
+                      ></div>
+                      <p className="text-base text-center mt-1 mx-auto mb-0 p-0 text-foreground-secondary">
+                        {itr === 6 ? "x" : itr + 1}
+                      </p>
+                    </div>
+                  );
+                })
+              : null}
+          </div>
+          <div className="text-center flex flex-row flex-wrap justify-center gap-4">
+            {!stats ? (
+              <p>sorry! nothing here!</p>
+            ) : (
+              Object.keys(StatsKeyDescriptions)
+                .filter((key: string) => key != "distribution")
+                .map((key: string) => (
+                  <div key={key} className="min-w-1/4">
+                    {stats[key as KeyState]}
+                    <br />
+                    <span className="text-foreground-secondary text-xl">
+                      {StatsKeyDescriptions[key as KeyState]}
+                    </span>
+                  </div>
+                ))
+            )}
+          </div>
+          <History />
+        </DialogDescription>
+      </DialogContent>
+    </Dialog>
+  );
 }
