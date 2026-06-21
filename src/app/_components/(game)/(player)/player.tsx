@@ -175,6 +175,7 @@ export default function Player({
                       i == 0 && "border-l-2",
                       currentAttempt >= i && "bg-background-secondary",
                     )}
+                    data-active={currentAttempt >= i ? "true" : undefined}
                     key={i}
                   ></div>
                 );

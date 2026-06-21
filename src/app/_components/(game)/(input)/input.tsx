@@ -101,6 +101,7 @@ export default function Input({
         }}
       >
         <div
+          data-cy="suggestions"
           className={cn(
             "absolute bottom-full w-full hidden flex-col flex-nowrap",
             showSuggestions && "flex",
