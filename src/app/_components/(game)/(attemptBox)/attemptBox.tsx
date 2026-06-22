@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTimes, faForward } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/lib/utils";
 import { Icon } from "@/app/_components/ui/icon";
 

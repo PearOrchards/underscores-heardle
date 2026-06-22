@@ -3,11 +3,6 @@ import { Rethink_Sans, Figtree, Montserrat } from "next/font/google";
 import "./globals.css";
 
 const rethinkSans = Rethink_Sans({ subsets: ["latin"] });
-
-// Import to stop flash of very large icon.
-import "@fortawesome/fontawesome-svg-core/styles.css";
-// Now stop fontawesome from doing that itself.
-import { config } from "@fortawesome/fontawesome-svg-core";
 import { cn } from "@/lib/utils";
 
 const montserratHeading = Montserrat({
@@ -16,8 +11,6 @@ const montserratHeading = Montserrat({
 });
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
-
-config.autoAddCss = false;
 
 export const metadata: Metadata = {
   title: "underscores heardle",
