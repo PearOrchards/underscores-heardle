@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     creator: "@pearorchards_",
     card: "summary_large_image",
   },
-  metadataBase: new URL(process.env.URL || ""),
+  metadataBase: new URL(process.env.URL || "http://localhost:5000"),
 };
 
 export const viewport: Viewport = {

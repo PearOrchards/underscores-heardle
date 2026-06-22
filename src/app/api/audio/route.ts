@@ -85,7 +85,7 @@ async function processAudioFile(audioFile: string, slug: string, offset?: number
 
 	command.on("error", err => {
 		console.error(err);
-		throw new Response("FFMPEG_ERROR", { status: 500 });
+		return new Response("FFMPEG_ERROR", { status: 500 });
 	});
 
 	// Pipe the output from ffmpeg to a stream
@@ -130,7 +130,7 @@ export async function GET(request: NextRequest) {
 
 	try {
 		const finalBuffer = await processAudioFile(audioFile, artist, offset || 0, Number(duration));
-		return new Response(finalBuffer, {
+		return new Response(new Uint8Array(finalBuffer), {
 			headers: {
 				"Content-Type": "audio/mpeg",
 				"Content-Length": finalBuffer.length.toString(),
@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
 		});
 	} catch (err) {
 		console.error(err);
-		throw new Response("API_UNKNOWN_ERROR", { status: 500 });
+		return new Response("API_UNKNOWN_ERROR", { status: 500 });
 	}
 }
 export const dynamic = 'force-dynamic';
