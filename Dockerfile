@@ -4,8 +4,9 @@ ARG NODE_IMAGE=node:26-alpine
 FROM ${NODE_IMAGE} AS builder
 WORKDIR /app
 RUN npm i -g corepack@latest && corepack enable
-# manifest first so the install layer caches until the lockfile changes
-COPY package.json pnpm-lock.yaml ./
+# manifest first so the install layer caches until the lockfile changes.
+# and copy pnpm-workspace.yaml since it carries the allowBuilds / supply-chain settings
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm install --frozen-lockfile
 COPY . .
 # metadataBase / OpenGraph image URLs are baked into static pages at build time.
