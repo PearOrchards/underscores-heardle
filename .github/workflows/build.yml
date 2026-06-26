@@ -1,0 +1,24 @@
+name: Build
+
+on:
+  pull_request:
+
+# Builds the production Docker image (no push) so PRs catch build breakages 
+# against the exact artifact that ships.
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build image (no push)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          build-args: |
+            URL=http://localhost:5000
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

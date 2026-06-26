@@ -1,0 +1,12 @@
+services:
+  web:
+    # Built in CI and pushed to GHCR by the publish workflow; the server only
+    # pulls + runs it (never builds).
+    image: ghcr.io/pearorchards/underscores-heardle:latest
+    container_name: heardle
+    restart: unless-stopped
+    # Runtime config. Create a .env in this dir on the server
+    env_file:
+      - .env
+    ports:
+      - "5000:5000"

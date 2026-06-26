@@ -1,36 +1,52 @@
 "use client";
-import styles from "../navbar.module.scss";
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleQuestion, faMusic, faThumbsUp, faVolumeHigh} from "@fortawesome/free-solid-svg-icons";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "@/app/_components/ui/dialog";
+import { Icon, type IconType } from "@/app/_components/ui/icon";
+import { Button } from "@/app/_components/ui/button";
 
-import { useState } from "react";
-
-import Dialog from "@/app/_components/(dialog)/dialog";
+const lines = [
+  {
+    icon: "Music",
+    text: "Listen to the intro, then find the correct song in the list.",
+  },
+  {
+    icon: "Volume2",
+    text: "Skipped or incorrect attempts unlock more of the song.",
+  },
+  {
+    icon: "ThumbsUp",
+    text: "Answer in as few attempts as possible, then share you score!",
+  },
+] as { icon: IconType; text: string }[];
 
 export default function Help() {
-	const [showHelpModal, setShowHelpModal] = useState<boolean>(false);
-	const openHelpModal = () => setShowHelpModal(true);
-	const closeHelpModal = () => setShowHelpModal(false);
-	
-	return (
-		<>
-			<FontAwesomeIcon icon={faCircleQuestion} className={styles.fa} onClick={openHelpModal}/>
-			<Dialog isOpen={showHelpModal} onClose={closeHelpModal}>
-				<h2>how to play</h2>
-				<div>
-					<p><FontAwesomeIcon icon={faMusic}/> Listen to the intro, then find the correct song in the
-						list.</p>
-					<p><FontAwesomeIcon icon={faVolumeHigh}/> Skipped or incorrect attempts unlock more of the
-						intro.</p>
-					<p><FontAwesomeIcon icon={faThumbsUp}/> Answer in as few tries as possible and share your score!
-					</p>
-				</div>
-				<h3><i>good luck!</i></h3>
-				
-				<button className="alt" onClick={closeHelpModal}>PLAY</button>
-			
-			</Dialog>
-		</>
-	)
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Icon name="CircleQuestionMark" />
+      </DialogTrigger>
+      <DialogContent>
+        <DialogTitle>how to play</DialogTitle>
+        <DialogDescription>
+          <ul className="space-y-4">
+            {lines.map(({ icon, text }) => (
+              <li key={icon} className="flex gap-2">
+                <Icon name={icon} />
+                {text}
+              </li>
+            ))}
+          </ul>
+          <i className="ml-auto mr-2 text-4xl font-bold">good luck!</i>
+
+          <Button variant="alt">PLAY</Button>
+        </DialogDescription>
+      </DialogContent>
+    </Dialog>
+  );
 }

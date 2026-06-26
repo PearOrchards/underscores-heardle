@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
 		contentType = imageData.headers.get("Content-Type") ?? "image/png";
 	} catch (err: any) {
 		const local = path.join(process.cwd(), "public", "dvd.png");
-		buffer = readFileSync(local);
+		buffer = new Uint8Array(readFileSync(local)).buffer;
 		contentType = "image/png";
 	}
 
