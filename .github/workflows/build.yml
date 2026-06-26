@@ -3,35 +3,22 @@ name: Build
 on:
   pull_request:
 
+# Builds the production Docker image (no push) so PRs catch build breakages 
+# against the exact artifact that ships.
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    env:
-      # next build doesn't touch Mongo so these are just stubs
-      HARDLY_RANDOM_SEED: "42"
-      SOUNDCLOUD_CLIENT: ci
-      SOUNDCLOUD_SECRET: ci
-      FALLBACK_CLIENT: ci
-      URL: http://localhost:5000
-      UNIX_TIMESTAMP_DAY_1: "0"
-      AUTH_SECRET: ci-secret
-      NEXTAUTH_URL: http://localhost:5000
-      GOOGLE_CLIENT_ID: ci
-      GOOGLE_CLIENT_SECRET: ci
-
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
+      - uses: docker/setup-buildx-action@v3
 
-      - uses: actions/setup-node@v4
+      - name: Build image (no push)
+        uses: docker/build-push-action@v6
         with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build
-        run: pnpm build
+          context: .
+          push: false
+          build-args: |
+            URL=http://localhost:5000
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
