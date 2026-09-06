@@ -1,6 +1,6 @@
 import Navbar from "@/app/_components/(navbar)/navbar";
 import Game from "@/app/_components/(game)/game";
-import Artist from "@/../models/Artist";
+import { db } from "@prisma/db";
 
 export default async function GameHome({
   params,
@@ -8,7 +8,7 @@ export default async function GameHome({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const artist = await Artist.findOne({ slug });
+  const artist = await db.orm.artists.where({ slug }).first();
 
   if (!artist) {
     throw new Error(`No artist found from "${slug}"`);

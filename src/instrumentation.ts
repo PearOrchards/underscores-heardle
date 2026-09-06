@@ -1,7 +1,12 @@
-import { connect } from "./lib/db";
+import { assertEnv } from "@/lib/env";
 
+// Runs once at server start.
 export async function register() {
-    await connect();
+	if (process.env["NEXT_RUNTIME"] !== "nodejs") return;
 
-    // ! This would be a good spot to add code for pulling songs!
+	try {
+		assertEnv();
+	} catch (error) {
+	  console.error(error instanceof Error ? error.message : error);
+	}
 }

@@ -1,0 +1,91 @@
+// use prisma-next
+
+type ArtistsSongs {
+  soundcloud ArtistsSongsSoundcloud[]
+  tracker    ArtistsSongsTracker[]
+}
+
+type ArtistsSongsSoundcloud {
+  answer String
+  link   String
+  offset Int?
+}
+
+type ArtistsSongsTracker {
+  answer String
+  link   String
+  offset Int?
+}
+
+model Artists {
+  id           ObjectId     @id @default(auto()) @map("_id")
+  colour       String
+  displayName  String
+  lastAccessed DateTime     @db.Date
+  slug         String       @unique(map: "slug")
+  songs        ArtistsSongs
+
+  @@map("artists")
+}
+
+// --- BetterAuth ---
+// Written only by Better Auth (src/lib/auth.ts); read-only from Prisma.
+// Fields mirror @better-auth/core getAuthTables() v1.6.x.
+
+model User {
+  id            ObjectId  @id @default(auto()) @map("_id")
+  name          String
+  email         String    @unique
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @db.Date
+  updatedAt     DateTime  @db.Date
+  sessions      Session[]
+  accounts      Account[]
+
+  @@map("user")
+}
+
+model Session {
+  id        ObjectId @id @default(auto()) @map("_id")
+  userId    ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime @db.Date
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @db.Date
+  updatedAt DateTime @db.Date
+
+  @@map("session")
+}
+
+model Account {
+  id                    ObjectId  @id @default(auto()) @map("_id")
+  userId                ObjectId
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime? @db.Date
+  refreshTokenExpiresAt DateTime? @db.Date
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @db.Date
+  updatedAt             DateTime  @db.Date
+
+  @@map("account")
+}
+
+model Verification {
+  id         ObjectId @id @default(auto()) @map("_id")
+  identifier String
+  value      String
+  expiresAt  DateTime @db.Date
+  createdAt  DateTime @db.Date
+  updatedAt  DateTime @db.Date
+
+  @@map("verification")
+}

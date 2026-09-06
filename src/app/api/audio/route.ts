@@ -7,7 +7,7 @@ import {SongToday} from "@/app/_components/SongToday";
 
 import Soundcloud from "soundcloud.ts";
 import ffmpeg from "fluent-ffmpeg";
-import Artist from "@/../models/Artist";
+import { db } from "@prisma/db";
 
 async function getSoundcloudTSAudio(url: string): Promise<string> {
 	const sc = new Soundcloud();
@@ -31,7 +31,7 @@ async function getPillowcaseAudio(url: string): Promise<string> {
  */
 async function processAudioFile(audioFile: string, slug: string, offset?: number, duration?: number): Promise<Buffer> {
 	// First, when was the last time we downloaded a song for this artist?
-	const artist = await Artist.findOne({ slug });
+  const artist = await db.orm.artists.where({ slug }).first();
 	if (!artist) throw new Error("How have we got here with NO ARTIST!?");
 
 	const tempFile = path.join(tmpdir(), `${btoa(slug)}.mp3`);
@@ -39,7 +39,7 @@ async function processAudioFile(audioFile: string, slug: string, offset?: number
 	midnight.setUTCHours(0, 0, 0, 0);
 
 	// Has it been accessed today, or does the file not even exist?
-	if (!existsSync(tempFile) || !artist.lastAccessed || artist.lastAccessed < midnight.getTime()) {
+	if (!existsSync(tempFile) || !artist.lastAccessed || artist.lastAccessed < midnight) {
 		// If not, it needs to be downloaded.
 		const res = await fetch(audioFile);
 		if (!res.ok) throw new Error("Failed to fetch audio from remote.");
@@ -56,8 +56,9 @@ async function processAudioFile(audioFile: string, slug: string, offset?: number
 	}
 
 	// Update the last accessed date
-	artist.lastAccessed = Date.now();
-	await artist.save();
+  db.orm.artists
+    .where({ _id: artist._id })
+    .update({ lastAccessed: new Date() });
 
 	// If there's no duration, just return the whole thing
 	if (!duration) {

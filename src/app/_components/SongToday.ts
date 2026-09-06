@@ -1,5 +1,6 @@
 "use server";
-import Artist from "@/../models/Artist";
+import { db } from "@prisma/db";
+import { env } from "@/lib/env";
 
 export type SongData = {
 	answer: string;
@@ -35,11 +36,10 @@ function shuffleArray<T>(array: T[], seed: number): T[] {
 }
 
 export async function SongToday(artist: string): Promise<SongData> {
-	if (!process.env.HARDLY_RANDOM_SEED) throw new Error("Environment not correctly set up.");
-	const seed = parseInt(process.env.HARDLY_RANDOM_SEED);
+	const seed = parseInt(env("HARDLY_RANDOM_SEED"));
 	if (!artist) throw new Error("No artist provided!");
 
-	const artistData = await Artist.findOne({ slug: artist });
+	const artistData = await db.orm.artists.where({ slug: artist }).first();
 	if (!artistData) throw new Error("Artist not found!");
 	const songList = artistData.songs;
 
@@ -58,7 +58,7 @@ export async function SongToday(artist: string): Promise<SongData> {
 		answer: todayPick.answer,
 		link: todayPick.link,
 		source,
-		offset: todayPick.offset,
+		offset: todayPick.offset ?? 0,
 	};
 }
 
