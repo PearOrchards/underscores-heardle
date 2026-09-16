@@ -1,5 +1,4 @@
 // use prisma-next
-
 type ArtistsSongs {
   soundcloud ArtistsSongsSoundcloud[]
   tracker    ArtistsSongsTracker[]
@@ -24,24 +23,35 @@ model Artists {
   lastAccessed DateTime     @db.Date
   slug         String       @unique(map: "slug")
   songs        ArtistsSongs
+  createdById  ObjectId?
+  createdBy    User?        @relation(fields:[createdById], references:[id], onDelete: SetNull)
 
   @@map("artists")
 }
 
+model Admin {
+  id     ObjectId @id @default(auto()) @map("_id")
+  userId ObjectId @unique
+  user   User     @relation(fields:[userId], references:[id], onDelete: Cascade)
+
+  @@map("admin")
+}
+
 // --- BetterAuth ---
 // Written only by Better Auth (src/lib/auth.ts); read-only from Prisma.
-// Fields mirror @better-auth/core getAuthTables() v1.6.x.
-
+// Fields mirror @better-auth/core getAuthTables() v1.7.x.
 model User {
-  id            ObjectId  @id @default(auto()) @map("_id")
-  name          String
-  email         String    @unique
-  emailVerified Boolean   @default(false)
-  image         String?
-  createdAt     DateTime  @db.Date
-  updatedAt     DateTime  @db.Date
-  sessions      Session[]
-  accounts      Account[]
+  id             ObjectId  @id @default(auto()) @map("_id")
+  name           String
+  email          String    @unique
+  emailVerified  Boolean   @default(false)
+  image          String?
+  createdAt      DateTime  @db.Date
+  updatedAt      DateTime  @db.Date
+  sessions       Session[]
+  accounts       Account[]
+  artistsCreated Artists[]
+  admin          Admin?
 
   @@map("user")
 }
@@ -49,7 +59,7 @@ model User {
 model Session {
   id        ObjectId @id @default(auto()) @map("_id")
   userId    ObjectId
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields:[userId], references:[id], onDelete: Cascade)
   token     String   @unique
   expiresAt DateTime @db.Date
   ipAddress String?
@@ -63,9 +73,10 @@ model Session {
 model Account {
   id                    ObjectId  @id @default(auto()) @map("_id")
   userId                ObjectId
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User      @relation(fields:[userId], references:[id], onDelete: Cascade)
   accountId             String
   providerId            String
+  issuer                String
   accessToken           String?
   refreshToken          String?
   idToken               String?

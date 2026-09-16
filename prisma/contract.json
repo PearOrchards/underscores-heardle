@@ -8,6 +8,10 @@
       "model": "Account",
       "namespace": "__unbound__"
     },
+    "admin": {
+      "model": "Admin",
+      "namespace": "__unbound__"
+    },
     "artists": {
       "model": "Artists",
       "namespace": "__unbound__"
@@ -68,6 +72,13 @@
               },
               "idToken": {
                 "nullable": true,
+                "type": {
+                  "codecId": "mongo/string@1",
+                  "kind": "scalar"
+                }
+              },
+              "issuer": {
+                "nullable": false,
                 "type": {
                   "codecId": "mongo/string@1",
                   "kind": "scalar"
@@ -144,6 +155,44 @@
               "collection": "account"
             }
           },
+          "Admin": {
+            "fields": {
+              "_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "mongo/objectId@1",
+                  "kind": "scalar"
+                }
+              },
+              "userId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "mongo/objectId@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "user": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "_id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "__unbound__"
+                }
+              }
+            },
+            "storage": {
+              "collection": "admin"
+            }
+          },
           "Artists": {
             "fields": {
               "_id": {
@@ -157,6 +206,13 @@
                 "nullable": false,
                 "type": {
                   "codecId": "mongo/string@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdById": {
+                "nullable": true,
+                "type": {
+                  "codecId": "mongo/objectId@1",
                   "kind": "scalar"
                 }
               },
@@ -189,7 +245,23 @@
                 }
               }
             },
-            "relations": {},
+            "relations": {
+              "createdBy": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "createdById"
+                  ],
+                  "targetFields": [
+                    "_id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "__unbound__"
+                }
+              }
+            },
             "storage": {
               "collection": "artists"
             }
@@ -339,6 +411,36 @@
                 },
                 "to": {
                   "model": "Account",
+                  "namespace": "__unbound__"
+                }
+              },
+              "admin": {
+                "cardinality": "1:1",
+                "on": {
+                  "localFields": [
+                    "_id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "Admin",
+                  "namespace": "__unbound__"
+                }
+              },
+              "artistsCreated": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "_id"
+                  ],
+                  "targetFields": [
+                    "createdById"
+                  ]
+                },
+                "to": {
+                  "model": "Artists",
                   "namespace": "__unbound__"
                 }
               },
@@ -527,6 +629,9 @@
                         "string"
                       ]
                     },
+                    "issuer": {
+                      "bsonType": "string"
+                    },
                     "password": {
                       "bsonType": [
                         "null",
@@ -565,8 +670,45 @@
                     "_id",
                     "accountId",
                     "createdAt",
+                    "issuer",
                     "providerId",
                     "updatedAt",
+                    "userId"
+                  ]
+                },
+                "kind": "mongo-validator",
+                "validationAction": "error",
+                "validationLevel": "strict"
+              }
+            },
+            "admin": {
+              "indexes": [
+                {
+                  "keys": [
+                    {
+                      "direction": 1,
+                      "field": "userId"
+                    }
+                  ],
+                  "kind": "mongo-index",
+                  "unique": true
+                }
+              ],
+              "kind": "mongo-collection",
+              "validator": {
+                "jsonSchema": {
+                  "additionalProperties": false,
+                  "bsonType": "object",
+                  "properties": {
+                    "_id": {
+                      "bsonType": "objectId"
+                    },
+                    "userId": {
+                      "bsonType": "objectId"
+                    }
+                  },
+                  "required": [
+                    "_id",
                     "userId"
                   ]
                 },
@@ -599,6 +741,12 @@
                     },
                     "colour": {
                       "bsonType": "string"
+                    },
+                    "createdById": {
+                      "bsonType": [
+                        "null",
+                        "objectId"
+                      ]
                     },
                     "displayName": {
                       "bsonType": "string"
@@ -852,7 +1000,7 @@
         "kind": "mongo-database"
       }
     },
-    "storageHash": "4bd909bf13bd974b52198c4e461327cd153ad752822de377bc744ae145c91490"
+    "storageHash": "2425871a22cf9b5a61f8a189554151032f7d12a4cd60a0611e67c52dcd9adb3d"
   },
   "capabilities": {},
   "extensions": {},

@@ -17,7 +17,7 @@ import type {
 } from '@prisma/orm-mongo/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'4bd909bf13bd974b52198c4e461327cd153ad752822de377bc744ae145c91490'>;
+  StorageHashBase<'2425871a22cf9b5a61f8a189554151032f7d12a4cd60a0611e67c52dcd9adb3d'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'251b3ce23f6c9f561892e7c1af9d2cc941a13d64ba1aa7226b90036b09568cc3'>;
@@ -59,6 +59,7 @@ export type FieldOutputTypes = {
       readonly userId: CodecTypes['mongo/objectId@1']['output'];
       readonly accountId: CodecTypes['mongo/string@1']['output'];
       readonly providerId: CodecTypes['mongo/string@1']['output'];
+      readonly issuer: CodecTypes['mongo/string@1']['output'];
       readonly accessToken: CodecTypes['mongo/string@1']['output'] | null;
       readonly refreshToken: CodecTypes['mongo/string@1']['output'] | null;
       readonly idToken: CodecTypes['mongo/string@1']['output'] | null;
@@ -69,6 +70,10 @@ export type FieldOutputTypes = {
       readonly createdAt: CodecTypes['mongo/date@1']['output'];
       readonly updatedAt: CodecTypes['mongo/date@1']['output'];
     };
+    readonly Admin: {
+      readonly _id: CodecTypes['mongo/objectId@1']['output'];
+      readonly userId: CodecTypes['mongo/objectId@1']['output'];
+    };
     readonly Artists: {
       readonly _id: CodecTypes['mongo/objectId@1']['output'];
       readonly colour: CodecTypes['mongo/string@1']['output'];
@@ -76,6 +81,7 @@ export type FieldOutputTypes = {
       readonly lastAccessed: CodecTypes['mongo/date@1']['output'];
       readonly slug: CodecTypes['mongo/string@1']['output'];
       readonly songs: ArtistsSongsOutput;
+      readonly createdById: CodecTypes['mongo/objectId@1']['output'] | null;
     };
     readonly Session: {
       readonly _id: CodecTypes['mongo/objectId@1']['output'];
@@ -113,6 +119,7 @@ export type FieldInputTypes = {
       readonly userId: CodecTypes['mongo/objectId@1']['input'];
       readonly accountId: CodecTypes['mongo/string@1']['input'];
       readonly providerId: CodecTypes['mongo/string@1']['input'];
+      readonly issuer: CodecTypes['mongo/string@1']['input'];
       readonly accessToken: CodecTypes['mongo/string@1']['input'] | null;
       readonly refreshToken: CodecTypes['mongo/string@1']['input'] | null;
       readonly idToken: CodecTypes['mongo/string@1']['input'] | null;
@@ -123,6 +130,10 @@ export type FieldInputTypes = {
       readonly createdAt: CodecTypes['mongo/date@1']['input'];
       readonly updatedAt: CodecTypes['mongo/date@1']['input'];
     };
+    readonly Admin: {
+      readonly _id: CodecTypes['mongo/objectId@1']['input'];
+      readonly userId: CodecTypes['mongo/objectId@1']['input'];
+    };
     readonly Artists: {
       readonly _id: CodecTypes['mongo/objectId@1']['input'];
       readonly colour: CodecTypes['mongo/string@1']['input'];
@@ -130,6 +141,7 @@ export type FieldInputTypes = {
       readonly lastAccessed: CodecTypes['mongo/date@1']['input'];
       readonly slug: CodecTypes['mongo/string@1']['input'];
       readonly songs: ArtistsSongsInput;
+      readonly createdById: CodecTypes['mongo/objectId@1']['input'] | null;
     };
     readonly Session: {
       readonly _id: CodecTypes['mongo/objectId@1']['input'];
@@ -181,6 +193,7 @@ type ContractBase = Omit<
                     readonly userId: { readonly bsonType: 'objectId' };
                     readonly accountId: { readonly bsonType: 'string' };
                     readonly providerId: { readonly bsonType: 'string' };
+                    readonly issuer: { readonly bsonType: 'string' };
                     readonly accessToken: { readonly bsonType: readonly ['null', 'string'] };
                     readonly refreshToken: { readonly bsonType: readonly ['null', 'string'] };
                     readonly idToken: { readonly bsonType: readonly ['null', 'string'] };
@@ -198,10 +211,35 @@ type ContractBase = Omit<
                     '_id',
                     'accountId',
                     'createdAt',
+                    'issuer',
                     'providerId',
                     'updatedAt',
                     'userId',
                   ];
+                };
+                readonly validationLevel: 'strict';
+                readonly validationAction: 'error';
+              };
+            };
+            readonly admin: {
+              readonly kind: 'mongo-collection';
+              readonly indexes: readonly [
+                {
+                  readonly kind: 'mongo-index';
+                  readonly keys: readonly [{ readonly field: 'userId'; readonly direction: 1 }];
+                  readonly unique: true;
+                },
+              ];
+              readonly validator: {
+                readonly kind: 'mongo-validator';
+                readonly jsonSchema: {
+                  readonly bsonType: 'object';
+                  readonly properties: {
+                    readonly _id: { readonly bsonType: 'objectId' };
+                    readonly userId: { readonly bsonType: 'objectId' };
+                  };
+                  readonly additionalProperties: false;
+                  readonly required: readonly ['_id', 'userId'];
                 };
                 readonly validationLevel: 'strict';
                 readonly validationAction: 'error';
@@ -259,6 +297,7 @@ type ContractBase = Omit<
                       readonly additionalProperties: false;
                       readonly required: readonly ['soundcloud', 'tracker'];
                     };
+                    readonly createdById: { readonly bsonType: readonly ['null', 'objectId'] };
                   };
                   readonly additionalProperties: false;
                   readonly required: readonly [
@@ -390,6 +429,7 @@ type ContractBase = Omit<
       readonly namespace: '__unbound__' & NamespaceId;
       readonly model: 'Artists';
     };
+    readonly admin: { readonly namespace: '__unbound__' & NamespaceId; readonly model: 'Admin' };
     readonly user: { readonly namespace: '__unbound__' & NamespaceId; readonly model: 'User' };
     readonly session: {
       readonly namespace: '__unbound__' & NamespaceId;
@@ -423,6 +463,10 @@ type ContractBase = Omit<
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
               };
               readonly providerId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly issuer: {
                 readonly nullable: false;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
               };
@@ -478,6 +522,32 @@ type ContractBase = Omit<
             };
             readonly storage: { readonly collection: 'account' };
           };
+          readonly Admin: {
+            readonly fields: {
+              readonly _id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+            };
+            readonly relations: {
+              readonly user: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'User';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['_id'];
+                };
+              };
+            };
+            readonly storage: { readonly collection: 'admin' };
+          };
           readonly Artists: {
             readonly fields: {
               readonly _id: {
@@ -504,8 +574,24 @@ type ContractBase = Omit<
                 readonly nullable: false;
                 readonly type: { readonly kind: 'valueObject'; readonly name: 'ArtistsSongs' };
               };
+              readonly createdById: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
             };
-            readonly relations: Record<string, never>;
+            readonly relations: {
+              readonly createdBy: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'User';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['createdById'];
+                  readonly targetFields: readonly ['_id'];
+                };
+              };
+            };
             readonly storage: { readonly collection: 'artists' };
           };
           readonly Session: {
@@ -607,6 +693,28 @@ type ContractBase = Omit<
                   readonly model: 'Account';
                 };
                 readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['_id'];
+                  readonly targetFields: readonly ['userId'];
+                };
+              };
+              readonly artistsCreated: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'Artists';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['_id'];
+                  readonly targetFields: readonly ['createdById'];
+                };
+              };
+              readonly admin: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'Admin';
+                };
+                readonly cardinality: '1:1';
                 readonly on: {
                   readonly localFields: readonly ['_id'];
                   readonly targetFields: readonly ['userId'];
