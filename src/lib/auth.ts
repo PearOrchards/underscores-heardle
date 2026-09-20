@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth/minimal";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { getMongoClient, getMongoDb } from "@/lib/mongo";
 import { env } from "@/lib/env";
+import { nextCookies } from "better-auth/next-js";
 
 function createAuth() {
 	return betterAuth({
@@ -11,7 +12,8 @@ function createAuth() {
 				clientId: env("GOOGLE_CLIENT_ID"),
 				clientSecret: env("GOOGLE_CLIENT_SECRET"),
 			},
-		},
+    },
+		plugins: [nextCookies()],
 	});
 }
 

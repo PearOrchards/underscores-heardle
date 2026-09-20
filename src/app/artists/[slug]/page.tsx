@@ -14,12 +14,9 @@ export default async function GameHome({
     throw new Error(`No artist found from "${slug}"`);
   }
 
-  // const artistData = artist.toObject();
-  // artistData._id = artistData._id.toString();
-
   return (
-    <main className="flex flex-col justify-between itmes-center min-h-screen">
-      <Navbar display={artist.displayName} />
+    <main className="flex flex-col justify-between min-h-screen">
+      <Navbar display={artist.displayName} createdBy={artist.createdById} />
       <Game artist={artist.slug} />
     </main>
   );

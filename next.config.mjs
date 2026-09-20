@@ -5,6 +5,9 @@ const nextConfig = {
   images: {
     localPatterns: [{ pathname: "/api/cover" }],
   },
+  experimental: {
+    authInterrupts: true,
+  }
 };
 
 export default nextConfig;
