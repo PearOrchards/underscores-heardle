@@ -1,9 +1,4 @@
 import SourceSelector from "./sourceSelector";
-import type { IconType } from "../ui/icon";
+import VerifyPanel from "./verifyEditor";
 
-type Source = {
-  name: string;
-  icon: IconType;
-}
-
-export { SourceSelector, type Source };
+export { SourceSelector, VerifyPanel };
