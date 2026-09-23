@@ -57,8 +57,8 @@ importers:
         specifier: ^4.16.2
         version: 4.19.1(typescript@5.9.3)
       soundcloud.ts:
-        specifier: ^0.6.9
-        version: 0.6.9
+        specifier: ^0.7.4
+        version: 0.7.4
       tailwind-merge:
         specifier: ^3.6.0
         version: 3.6.0
@@ -2431,6 +2431,9 @@ packages:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
 
+  browser-id3-writer@6.4.0:
+    resolution: {integrity: sha512-4tbo+MMGuINslAzZugHdLDGj6m2vKqgXqG4QXBYnPJndRw1jx1eGlDMNwsR6lKrjuzw+GZtHwFNoKuUJBbF22A==}
+
   browserslist@4.28.8:
     resolution: {integrity: sha512-V2NpofLblG64mfOtSgDhOJESZEGogzDMBv/q+W6oc4LXWP/q75eOXoOaaOu1EOadB9U4Bwx/e0yzbvwKH8zalA==}
     engines: {node: ^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7}
@@ -4740,8 +4743,8 @@ packages:
     resolution: {integrity: sha512-LJhUYUvItdQ0LkJTmPeaEObWXAqFyfmP85x0tch/ez9cahmhlBBLbIqDFnvBnUJGagb0JbIQrkBs1wJ+yRYpEw==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
 
-  soundcloud.ts@0.6.9:
-    resolution: {integrity: sha512-mOUpdtNFPhoz8xwoEQMLY/W6VQeXhAeoWEwaMVZozhb0qKX1IfWcXKr2LyxoDpZgOUovIb+gOx9wHQNj1YcO3w==}
+  soundcloud.ts@0.7.4:
+    resolution: {integrity: sha512-lP8INW6uloP3dHR75cj7CtRhwXLlxySW2WK/yzi2RlaRqOODF2F8E0xCZJxviqW8AtwtkU0jVjspaN4iRbEa5g==}
 
   source-map-js@1.2.1:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
@@ -7556,6 +7559,8 @@ snapshots:
     dependencies:
       fill-range: 7.1.1
 
+  browser-id3-writer@6.4.0: {}
+
   browserslist@4.28.8:
     dependencies:
       baseline-browser-mapping: 2.11.20
@@ -10145,7 +10150,9 @@ snapshots:
       ip-address: 10.7.0
       smart-buffer: 4.2.0
 
-  soundcloud.ts@0.6.9: {}
+  soundcloud.ts@0.7.4:
+    dependencies:
+      browser-id3-writer: 6.4.0
 
   source-map-js@1.2.1: {}
 
