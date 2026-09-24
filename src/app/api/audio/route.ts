@@ -138,9 +138,6 @@ export async function GET(request: NextRequest) {
 			});
   }
 
-  console.log(`Processing audio for ${artist} from ${source} with offset ${offset} and duration ${duration}`);
-  console.log(audioFile);
-
 	try {
 		const finalBuffer = await processAudioFile(audioFile, artist, offset || 0, Number(duration));
 		return new Response(new Uint8Array(finalBuffer), {

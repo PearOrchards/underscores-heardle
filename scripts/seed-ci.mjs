@@ -2,9 +2,9 @@
 // Since all the APIs are stubbed, we only need the bare minimum here.
 import mongoose from "mongoose";
 
-const uri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017";
+const uri = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/heardle";
 
-await mongoose.connect(uri, { dbName: "heardle" });
+await mongoose.connect(uri);
 
 await mongoose.connection.collection("artists").updateOne(
   { slug: "underscores" },

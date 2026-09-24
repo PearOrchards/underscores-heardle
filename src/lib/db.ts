@@ -15,7 +15,7 @@ export async function connect() {
     if (cached.conn) return cached.conn;
 
     if (!cached.promise) {
-        cached.promise = mongoose.connect(MONGO_URI, { dbName: "heardle", bufferCommands: false }).then(() => {
+        cached.promise = mongoose.connect(MONGO_URI, { bufferCommands: false }).then(() => {
             console.log(`MongoDB Connected successfully.`);
             return mongoose;
         });
