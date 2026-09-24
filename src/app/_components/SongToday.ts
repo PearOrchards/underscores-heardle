@@ -1,5 +1,5 @@
 "use server";
-import Artist from "@/../models/Artist";
+import Artist, { type SongData as T_SongData } from "@/../models/Artist";
 
 export type SongData = {
 	answer: string;
@@ -43,16 +43,18 @@ export async function SongToday(artist: string): Promise<SongData> {
 	if (!artistData) throw new Error("Artist not found!");
 	const songList = artistData.songs;
 
-	const totalSongs: number = songList.soundcloud.length + songList.tracker.length;
+	// Good lord why did I do it like this
+	const sources = ["soundcloud", "tracker", "deezer"] as const;
+	const allSongs = sources.flatMap((source) => songList[source].map((song: T_SongData) => ({ song, source })));
+	const totalSongs: number = allSongs.length;
 
 	const now = new Date();
 	const daysSinceEpoch = Math.floor(now.getTime() / 8.64e7); // idx for today
 
 	const shuffleRound = Math.floor(daysSinceEpoch / totalSongs);
-	const shuffledList = shuffleArray([...songList.soundcloud, ...songList.tracker], seed + shuffleRound);
+	const shuffledList = shuffleArray(allSongs, seed + shuffleRound);
 
-	const todayPick = shuffledList[daysSinceEpoch % totalSongs];
-	const source = (songList.soundcloud.indexOf(todayPick) > -1) ? "soundcloud" : "tracker";
+	const { song: todayPick, source } = shuffledList[daysSinceEpoch % totalSongs];
 
 	return {
 		answer: todayPick.answer,

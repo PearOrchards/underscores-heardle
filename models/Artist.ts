@@ -14,6 +14,7 @@ export interface Artists extends mongoose.Document {
     songs: {
         soundcloud: SongData[];
         tracker: SongData[];
+        deezer: SongData[];
     }
 }
 
@@ -57,6 +58,22 @@ const ArtistSchema = new mongoose.Schema<Artists>({
             default: [],
         },
         tracker: {
+            type: [{
+                _id: false,
+                answer: {
+                    type: String,
+                    required: true,
+                },
+                link: {
+                    type: String,
+                    required: true,
+                    unique: true,
+                },
+                offset: Number,
+            }],
+            default: [],
+        },
+        deezer: {
             type: [{
                 _id: false,
                 answer: {

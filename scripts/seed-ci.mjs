@@ -14,7 +14,7 @@ await mongoose.connection.collection("artists").updateOne(
       displayName: "underscores",
       colour: "#8b5cf6",
       lastAccessed: new Date(),
-      songs: { soundcloud: [], tracker: [] },
+      songs: { soundcloud: [], tracker: [], deezer: [] },
     },
   },
   { upsert: true },
