@@ -14,7 +14,7 @@ jobs:
           - 27017:27017
 
     env:
-      MONGO_URI: mongodb://127.0.0.1:27017
+      MONGO_URI: mongodb://127.0.0.1:27017/heardle
       HARDLY_RANDOM_SEED: "42"
       # Hardly any of this is exercised so all are just stubs
       SOUNDCLOUD_CLIENT: ci

@@ -22,11 +22,18 @@ async function getPillowcaseAudio(url: string): Promise<string> {
 	return `https://api.pillows.su/api/get/${id}.ogg`;
 }
 
+async function getDeezerAudio(url: string): Promise<string> {
+  const id = url.split("/").pop();
+  const songData = await fetch(`https://api.deezer.com/track/${id}`);
+  const data = await songData.json();
+  return data.preview;
+}
+
 /**
  * Processes an audio file by downloading it and trimming it to the specified offset and duration.
  * @param audioFile - The URL of the audio file to process.
  * @param slug - The slug of the artist to associate with the audio file.
- * @param offset - Seconds to start the audio from. Leave undefined to start from the beginning.
+ * @param offset - Milliseconds to start the audio from. Leave undefined to start from the beginning.
  * @param duration - Duration of the audio in seconds. Leave undefined to get the whole file.
  */
 async function processAudioFile(audioFile: string, slug: string, offset?: number, duration?: number): Promise<Buffer> {
@@ -75,7 +82,7 @@ async function processAudioFile(audioFile: string, slug: string, offset?: number
 
 	// Trim file down
 	const command = ffmpeg(tempFile)
-		.setStartTime(offset || 0)
+		.setStartTime((offset || 0) / 1000)
 		.setDuration(duration)
 		.audioCodec("libmp3lame")
 		.audioBitrate("96k")
@@ -121,12 +128,15 @@ export async function GET(request: NextRequest) {
 			break;
 		case "tracker":
 			audioFile = await getPillowcaseAudio(link);
-			break;
+      break;
+    case "deezer":
+      audioFile = await getDeezerAudio(link);
+      break;
 		default:
 			return new Response("Source not implemented", {
 				status: 500,
 			});
-	}
+  }
 
 	try {
 		const finalBuffer = await processAudioFile(audioFile, artist, offset || 0, Number(duration));
@@ -134,7 +144,7 @@ export async function GET(request: NextRequest) {
 			headers: {
 				"Content-Type": "audio/mpeg",
 				"Content-Length": finalBuffer.length.toString(),
-				"X-Offset": offset ? offset.toString() : "",
+				"X-Offset": "",
 			}
 		});
 	} catch (err) {

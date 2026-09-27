@@ -7,7 +7,8 @@ export async function SongSuggestions(artist: string, query: string): Promise<st
 	const songList = artistData.songs;
 
 	const songNames = [ ...songList.soundcloud.map((song: any) => song.answer),
-		...songList.tracker.map((song: any) => song.answer) ];
+		...songList.tracker.map((song: any) => song.answer),
+		...songList.deezer.map((song: any) => song.answer)];
 
 	return (query == "") ? songNames : songNames.filter((song) => song.toLowerCase().includes(query.toLowerCase()));
 }

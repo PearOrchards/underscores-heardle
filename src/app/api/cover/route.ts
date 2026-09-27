@@ -17,6 +17,13 @@ async function getPillowcaseCover(url: string): Promise<string> {
 	return `https://api.pillowcase.su/api/cover/${id}`;
 }
 
+async function getDeezerCover(url: string): Promise<string> {
+  const id = url.split("/").pop();
+  const songData = await fetch(`https://api.deezer.com/track/${id}`);
+  const data = await songData.json();
+  return data.album.cover_medium ?? "";
+}
+
 export async function GET(req: NextRequest) {
 	const artist = req.nextUrl.searchParams.get("artist");
 	if (artist === null) return new Response("No artist provided!", { status: 400 });
@@ -30,7 +37,10 @@ export async function GET(req: NextRequest) {
 			break;
 		case "tracker":
 			cover = await getPillowcaseCover(link);
-			break;
+      break;
+    case "deezer":
+      cover = await getDeezerCover(link);
+      break;
 		default:
 			cover = "";
 	}
@@ -40,9 +50,12 @@ export async function GET(req: NextRequest) {
 	try {
 		if (cover === "") throw new Error("No cover found."); // Just so the catch below can pick it up.
 		const imageData = await fetch(cover);
-		if (!imageData.ok) throw new Error("Couldn't get cover.");
+    if (!imageData.ok) throw new Error("Couldn't get cover.");
+
+		const fetchedType = imageData.headers.get("Content-Type");
+		if (!fetchedType || !fetchedType.startsWith("image/")) throw new Error("Cover isn't an image.");
 		buffer = await imageData.arrayBuffer();
-		contentType = imageData.headers.get("Content-Type") ?? "image/png";
+		contentType = fetchedType ?? "image/png";
 	} catch (err: any) {
 		const local = path.join(process.cwd(), "public", "dvd.png");
 		buffer = new Uint8Array(readFileSync(local)).buffer;

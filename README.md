@@ -6,6 +6,11 @@ To start, this was created for the [daily underscores heardle series](https://ww
 
 Most clones of Heardle use Soundcloud only for their backend, which is fine, except that after doing the Heardle 100 times, I started to get the same songs over and over again, which didn't make the videos very interesting. So I decided I'd add some absolutely ridiculous songs to the list, and here we are.
 
+### SoundCloud Deprecation Notice
+Due to ongoing changes in the SoundCloud API, this project can still pull some songs, but not very reliably. It seems that some songs use the new "v2" API, which requires an active Artist Pro subscription, and frankly I think having to pay for an API key is a bit ridiculous.
+
+Therefore, it is now recommended to use Deezer instead. Works more reliably, with the downside that songs cannot be played from the beginning, but rather within the preview section. But I guess it is what it is.
+
 ## How To Play
 1. Go to the [underscores heardle website](https://heardle.orchards.dev) 
 2. If you don't know how to play, click the question mark in the navbar
