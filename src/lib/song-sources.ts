@@ -15,4 +15,5 @@ export type SongSource = {
 export const applicationSources = [
   { name: "SoundCloud", icon: "Cloud", identifier: "soundcloud" },
   { name: "Pillowcase", icon: "BedSingle", identifier: "tracker" },
+  { name: "Deezer", icon: "Disc3", identifier: "deezer" },
 ] as const as SongSource[];

@@ -17,7 +17,7 @@ import type {
 } from '@prisma/orm-mongo/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'2425871a22cf9b5a61f8a189554151032f7d12a4cd60a0611e67c52dcd9adb3d'>;
+  StorageHashBase<'1cdee6109280f656ad8c4cf9d4f0277ffe7740fa60af1f98e1453db09c250f6f'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'251b3ce23f6c9f561892e7c1af9d2cc941a13d64ba1aa7226b90036b09568cc3'>;
@@ -27,10 +27,12 @@ export type CodecTypes = MongoCodecTypes;
 export type ArtistsSongsOutput = {
   readonly soundcloud: ReadonlyArray<ArtistsSongsSoundcloudOutput>;
   readonly tracker: ReadonlyArray<ArtistsSongsTrackerOutput>;
+  readonly deezer: ReadonlyArray<ArtistsSongsDeezerOutput>;
 };
 export type ArtistsSongsInput = {
   readonly soundcloud: ReadonlyArray<ArtistsSongsSoundcloudInput>;
   readonly tracker: ReadonlyArray<ArtistsSongsTrackerInput>;
+  readonly deezer: ReadonlyArray<ArtistsSongsDeezerInput>;
 };
 export type ArtistsSongsSoundcloudOutput = {
   readonly answer: CodecTypes['mongo/string@1']['output'];
@@ -48,6 +50,16 @@ export type ArtistsSongsTrackerOutput = {
   readonly offset: CodecTypes['mongo/int32@1']['output'] | null;
 };
 export type ArtistsSongsTrackerInput = {
+  readonly answer: CodecTypes['mongo/string@1']['input'];
+  readonly link: CodecTypes['mongo/string@1']['input'];
+  readonly offset: CodecTypes['mongo/int32@1']['input'] | null;
+};
+export type ArtistsSongsDeezerOutput = {
+  readonly answer: CodecTypes['mongo/string@1']['output'];
+  readonly link: CodecTypes['mongo/string@1']['output'];
+  readonly offset: CodecTypes['mongo/int32@1']['output'] | null;
+};
+export type ArtistsSongsDeezerInput = {
   readonly answer: CodecTypes['mongo/string@1']['input'];
   readonly link: CodecTypes['mongo/string@1']['input'];
   readonly offset: CodecTypes['mongo/int32@1']['input'] | null;
@@ -293,9 +305,22 @@ type ContractBase = Omit<
                             readonly required: readonly ['answer', 'link'];
                           };
                         };
+                        readonly deezer: {
+                          readonly bsonType: 'array';
+                          readonly items: {
+                            readonly bsonType: 'object';
+                            readonly properties: {
+                              readonly answer: { readonly bsonType: 'string' };
+                              readonly link: { readonly bsonType: 'string' };
+                              readonly offset: { readonly bsonType: readonly ['null', 'int'] };
+                            };
+                            readonly additionalProperties: false;
+                            readonly required: readonly ['answer', 'link'];
+                          };
+                        };
                       };
                       readonly additionalProperties: false;
-                      readonly required: readonly ['soundcloud', 'tracker'];
+                      readonly required: readonly ['deezer', 'soundcloud', 'tracker'];
                     };
                     readonly createdById: { readonly bsonType: readonly ['null', 'objectId'] };
                   };
@@ -773,6 +798,14 @@ type ContractBase = Omit<
                 };
                 readonly many: true;
               };
+              readonly deezer: {
+                readonly nullable: false;
+                readonly type: {
+                  readonly kind: 'valueObject';
+                  readonly name: 'ArtistsSongsDeezer';
+                };
+                readonly many: true;
+              };
             };
           };
           readonly ArtistsSongsSoundcloud: {
@@ -792,6 +825,22 @@ type ContractBase = Omit<
             };
           };
           readonly ArtistsSongsTracker: {
+            readonly fields: {
+              readonly answer: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly link: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly offset: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+              };
+            };
+          };
+          readonly ArtistsSongsDeezer: {
             readonly fields: {
               readonly answer: {
                 readonly nullable: false;
@@ -827,6 +876,11 @@ type ContractBase = Omit<
           readonly type: { readonly kind: 'valueObject'; readonly name: 'ArtistsSongsTracker' };
           readonly many: true;
         };
+        readonly deezer: {
+          readonly nullable: false;
+          readonly type: { readonly kind: 'valueObject'; readonly name: 'ArtistsSongsDeezer' };
+          readonly many: true;
+        };
       };
     };
     readonly ArtistsSongsSoundcloud: {
@@ -846,6 +900,22 @@ type ContractBase = Omit<
       };
     };
     readonly ArtistsSongsTracker: {
+      readonly fields: {
+        readonly answer: {
+          readonly nullable: false;
+          readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+        };
+        readonly link: {
+          readonly nullable: false;
+          readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+        };
+        readonly offset: {
+          readonly nullable: true;
+          readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+        };
+      };
+    };
+    readonly ArtistsSongsDeezer: {
       readonly fields: {
         readonly answer: {
           readonly nullable: false;

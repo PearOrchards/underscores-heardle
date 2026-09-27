@@ -518,6 +518,14 @@
         "valueObjects": {
           "ArtistsSongs": {
             "fields": {
+              "deezer": {
+                "many": true,
+                "nullable": false,
+                "type": {
+                  "kind": "valueObject",
+                  "name": "ArtistsSongsDeezer"
+                }
+              },
               "soundcloud": {
                 "many": true,
                 "nullable": false,
@@ -532,6 +540,31 @@
                 "type": {
                   "kind": "valueObject",
                   "name": "ArtistsSongsTracker"
+                }
+              }
+            }
+          },
+          "ArtistsSongsDeezer": {
+            "fields": {
+              "answer": {
+                "nullable": false,
+                "type": {
+                  "codecId": "mongo/string@1",
+                  "kind": "scalar"
+                }
+              },
+              "link": {
+                "nullable": false,
+                "type": {
+                  "codecId": "mongo/string@1",
+                  "kind": "scalar"
+                }
+              },
+              "offset": {
+                "nullable": true,
+                "type": {
+                  "codecId": "mongo/int32@1",
+                  "kind": "scalar"
                 }
               }
             }
@@ -761,6 +794,31 @@
                       "additionalProperties": false,
                       "bsonType": "object",
                       "properties": {
+                        "deezer": {
+                          "bsonType": "array",
+                          "items": {
+                            "additionalProperties": false,
+                            "bsonType": "object",
+                            "properties": {
+                              "answer": {
+                                "bsonType": "string"
+                              },
+                              "link": {
+                                "bsonType": "string"
+                              },
+                              "offset": {
+                                "bsonType": [
+                                  "null",
+                                  "int"
+                                ]
+                              }
+                            },
+                            "required": [
+                              "answer",
+                              "link"
+                            ]
+                          }
+                        },
                         "soundcloud": {
                           "bsonType": "array",
                           "items": {
@@ -813,6 +871,7 @@
                         }
                       },
                       "required": [
+                        "deezer",
                         "soundcloud",
                         "tracker"
                       ]
@@ -1000,7 +1059,7 @@
         "kind": "mongo-database"
       }
     },
-    "storageHash": "2425871a22cf9b5a61f8a189554151032f7d12a4cd60a0611e67c52dcd9adb3d"
+    "storageHash": "1cdee6109280f656ad8c4cf9d4f0277ffe7740fa60af1f98e1453db09c250f6f"
   },
   "capabilities": {},
   "extensions": {},

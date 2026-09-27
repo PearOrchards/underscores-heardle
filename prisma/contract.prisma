@@ -2,6 +2,7 @@
 type ArtistsSongs {
   soundcloud ArtistsSongsSoundcloud[]
   tracker    ArtistsSongsTracker[]
+  deezer     ArtistsSongsDeezer[]
 }
 
 type ArtistsSongsSoundcloud {
@@ -11,6 +12,12 @@ type ArtistsSongsSoundcloud {
 }
 
 type ArtistsSongsTracker {
+  answer String
+  link   String
+  offset Int?
+}
+
+type ArtistsSongsDeezer {
   answer String
   link   String
   offset Int?
