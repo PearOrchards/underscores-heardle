@@ -21,7 +21,7 @@ async function getDeezerCover(url: string): Promise<string> {
   const id = url.split("/").pop();
   const songData = await fetch(`https://api.deezer.com/track/${id}`);
   const data = await songData.json();
-  return data.album.cover_medium;
+  return data.album.cover_medium ?? "";
 }
 
 export async function GET(req: NextRequest) {
@@ -50,9 +50,12 @@ export async function GET(req: NextRequest) {
 	try {
 		if (cover === "") throw new Error("No cover found."); // Just so the catch below can pick it up.
 		const imageData = await fetch(cover);
-		if (!imageData.ok) throw new Error("Couldn't get cover.");
+    if (!imageData.ok) throw new Error("Couldn't get cover.");
+
+		const fetchedType = imageData.headers.get("Content-Type");
+		if (!fetchedType || !fetchedType.startsWith("image/")) throw new Error("Cover isn't an image.");
 		buffer = await imageData.arrayBuffer();
-		contentType = imageData.headers.get("Content-Type") ?? "image/png";
+		contentType = fetchedType ?? "image/png";
 	} catch (err: any) {
 		const local = path.join(process.cwd(), "public", "dvd.png");
 		buffer = new Uint8Array(readFileSync(local)).buffer;
