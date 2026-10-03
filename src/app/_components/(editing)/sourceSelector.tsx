@@ -23,7 +23,7 @@ export default function SourceSelector({
   }
 
   return (
-    <div className="bg-background-secondary px-8 py-4 flex flex-col gap-4 h-full w-full">
+    <div className="bg-background-secondary px-8 pt-4 pb-8 flex flex-col gap-4 h-full w-full">
       <h1 className="text-4xl font-bold text-center">sources</h1>
       {availableSources.map((source: SongSource) => (
         <Label

@@ -41,11 +41,11 @@ export async function SongToday(artist: string): Promise<SongData> {
 
 	const artistData = await db.orm.artists.where({ slug: artist }).first();
 	if (!artistData) throw new Error("Artist not found!");
-	const songList = artistData.songs;
+  const songList = artistData.songs;
 
 	// Good lord why did I do it like this
 	const sources = ["soundcloud", "tracker", "deezer"] as const;
-	const allSongs = sources.flatMap((source) => songList[source].map((song) => ({ song, source })));
+	const allSongs = sources.flatMap((source) => (songList[source] ?? []).map((song) => ({ song, source })));
 	const totalSongs: number = allSongs.length;
 
 	const now = new Date();
