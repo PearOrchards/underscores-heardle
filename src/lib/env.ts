@@ -8,7 +8,8 @@ const REQUIRED = [
 	"GOOGLE_CLIENT_SECRET",
 	"HARDLY_RANDOM_SEED",
 	"UNIX_TIMESTAMP_DAY_1",
-	"URL",
+  "URL",
+	"ANON_AUTH_HASH"
 ] as const;
 
 /** Reads a required key, throwing if it is missing or empty. */

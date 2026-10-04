@@ -16,6 +16,10 @@
       "model": "Artists",
       "namespace": "__unbound__"
     },
+    "rounds": {
+      "model": "Rounds",
+      "namespace": "__unbound__"
+    },
     "session": {
       "model": "Session",
       "namespace": "__unbound__"
@@ -32,6 +36,29 @@
   "domain": {
     "namespaces": {
       "__unbound__": {
+        "enum": {
+          "RoundStates": {
+            "codecId": "mongo/string@1",
+            "members": [
+              {
+                "name": "PLAYING",
+                "value": "PLAYING"
+              },
+              {
+                "name": "WON",
+                "value": "WON"
+              },
+              {
+                "name": "LOST",
+                "value": "LOST"
+              },
+              {
+                "name": "FORFEIT",
+                "value": "FORFEIT"
+              }
+            ]
+          }
+        },
         "models": {
           "Account": {
             "fields": {
@@ -266,6 +293,93 @@
               "collection": "artists"
             }
           },
+          "Rounds": {
+            "fields": {
+              "_id": {
+                "nullable": false,
+                "type": {
+                  "codecId": "mongo/objectId@1",
+                  "kind": "scalar"
+                }
+              },
+              "answer": {
+                "nullable": true,
+                "type": {
+                  "codecId": "mongo/string@1",
+                  "kind": "scalar"
+                }
+              },
+              "artist": {
+                "nullable": false,
+                "type": {
+                  "codecId": "mongo/string@1",
+                  "kind": "scalar"
+                }
+              },
+              "createdAt": {
+                "nullable": false,
+                "type": {
+                  "codecId": "mongo/date@1",
+                  "kind": "scalar"
+                }
+              },
+              "day": {
+                "nullable": false,
+                "type": {
+                  "codecId": "mongo/int32@1",
+                  "kind": "scalar"
+                }
+              },
+              "guesses": {
+                "many": true,
+                "nullable": false,
+                "type": {
+                  "codecId": "mongo/string@1",
+                  "kind": "scalar"
+                }
+              },
+              "status": {
+                "nullable": false,
+                "type": {
+                  "codecId": "mongo/string@1",
+                  "kind": "scalar"
+                },
+                "valueSet": {
+                  "entityKind": "enum",
+                  "entityName": "RoundStates",
+                  "namespaceId": "__unbound__",
+                  "plane": "domain"
+                }
+              },
+              "userId": {
+                "nullable": false,
+                "type": {
+                  "codecId": "mongo/objectId@1",
+                  "kind": "scalar"
+                }
+              }
+            },
+            "relations": {
+              "user": {
+                "cardinality": "N:1",
+                "on": {
+                  "localFields": [
+                    "userId"
+                  ],
+                  "targetFields": [
+                    "_id"
+                  ]
+                },
+                "to": {
+                  "model": "User",
+                  "namespace": "__unbound__"
+                }
+              }
+            },
+            "storage": {
+              "collection": "rounds"
+            }
+          },
           "Session": {
             "fields": {
               "_id": {
@@ -441,6 +555,21 @@
                 },
                 "to": {
                   "model": "Artists",
+                  "namespace": "__unbound__"
+                }
+              },
+              "gamesPlayed": {
+                "cardinality": "1:N",
+                "on": {
+                  "localFields": [
+                    "_id"
+                  ],
+                  "targetFields": [
+                    "userId"
+                  ]
+                },
+                "to": {
+                  "model": "Rounds",
                   "namespace": "__unbound__"
                 }
               },
@@ -891,6 +1020,85 @@
                 "validationLevel": "strict"
               }
             },
+            "rounds": {
+              "indexes": [
+                {
+                  "keys": [
+                    {
+                      "direction": 1,
+                      "field": "userId"
+                    },
+                    {
+                      "direction": 1,
+                      "field": "artist"
+                    },
+                    {
+                      "direction": 1,
+                      "field": "day"
+                    }
+                  ],
+                  "kind": "mongo-index",
+                  "unique": true
+                }
+              ],
+              "kind": "mongo-collection",
+              "validator": {
+                "jsonSchema": {
+                  "additionalProperties": false,
+                  "bsonType": "object",
+                  "properties": {
+                    "_id": {
+                      "bsonType": "objectId"
+                    },
+                    "answer": {
+                      "bsonType": [
+                        "null",
+                        "string"
+                      ]
+                    },
+                    "artist": {
+                      "bsonType": "string"
+                    },
+                    "createdAt": {
+                      "bsonType": "date"
+                    },
+                    "day": {
+                      "bsonType": "int"
+                    },
+                    "guesses": {
+                      "bsonType": "array",
+                      "items": {
+                        "bsonType": "string"
+                      }
+                    },
+                    "status": {
+                      "bsonType": "string",
+                      "enum": [
+                        "PLAYING",
+                        "WON",
+                        "LOST",
+                        "FORFEIT"
+                      ]
+                    },
+                    "userId": {
+                      "bsonType": "objectId"
+                    }
+                  },
+                  "required": [
+                    "_id",
+                    "artist",
+                    "createdAt",
+                    "day",
+                    "guesses",
+                    "status",
+                    "userId"
+                  ]
+                },
+                "kind": "mongo-validator",
+                "validationAction": "error",
+                "validationLevel": "strict"
+              }
+            },
             "session": {
               "indexes": [
                 {
@@ -1053,13 +1261,24 @@
                 "validationLevel": "strict"
               }
             }
+          },
+          "valueSet": {
+            "RoundStates": {
+              "kind": "valueSet",
+              "values": [
+                "PLAYING",
+                "WON",
+                "LOST",
+                "FORFEIT"
+              ]
+            }
           }
         },
         "id": "__unbound__",
         "kind": "mongo-database"
       }
     },
-    "storageHash": "1cdee6109280f656ad8c4cf9d4f0277ffe7740fa60af1f98e1453db09c250f6f"
+    "storageHash": "45c64299189d18c2415db9b06e92bba13637d8336868c067e66a2845277b2fb5"
   },
   "capabilities": {},
   "extensions": {},

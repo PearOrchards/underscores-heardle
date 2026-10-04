@@ -3,7 +3,9 @@ import {tmpdir} from "os";
 import path from "node:path";
 import { existsSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 
-import {SongToday} from "@/app/_components/SongToday";
+import { getTodaysSongForArtist } from "@/lib/game/game-engine";
+import { currentDay, startOfDay } from "@/lib/game/day";
+import { loadGame } from "@/lib/game/storage";
 
 import Soundcloud from "soundcloud.ts";
 import ffmpeg from "fluent-ffmpeg";
@@ -42,8 +44,7 @@ async function processAudioFile(audioFile: string, slug: string, offset?: number
 	if (!artist) throw new Error("How have we got here with NO ARTIST!?");
 
 	const tempFile = path.join(tmpdir(), `${btoa(slug)}.mp3`);
-	const midnight = new Date();
-	midnight.setUTCHours(0, 0, 0, 0);
+  const midnight = startOfDay(currentDay());
 
 	// Has it been accessed today, or does the file not even exist?
 	if (!existsSync(tempFile) || !artist.lastAccessed || artist.lastAccessed < midnight) {
@@ -120,7 +121,10 @@ export async function GET(request: NextRequest) {
 	const duration = request.nextUrl.searchParams.get("duration");
 	if (artist === null) return new Response("No artist provided!", { status: 400 });
 
-	const { link, source, offset } = await SongToday(artist);
+  const { link, source, offset } = await getTodaysSongForArtist(artist);
+  const { state: gameState } = await loadGame(artist);
+  const enforcedDuration = (gameState.status !== "PLAYING") ? Number(duration) : gameState.guesses.length ** 2;
+  
 	let audioFile = "";
 
 	switch (source) {
@@ -140,7 +144,7 @@ export async function GET(request: NextRequest) {
   }
 
 	try {
-		const finalBuffer = await processAudioFile(audioFile, artist, offset || 0, Number(duration));
+		const finalBuffer = await processAudioFile(audioFile, artist, offset || 0, enforcedDuration));
 		return new Response(new Uint8Array(finalBuffer), {
 			headers: {
 				"Content-Type": "audio/mpeg",

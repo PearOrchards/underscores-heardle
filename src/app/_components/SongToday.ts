@@ -1,6 +1,7 @@
 "use server";
 import { db } from "@prisma/db";
 import { env } from "@/lib/env";
+import { currentDay } from "@/lib/game/day";
 
 export type SongData = {
 	answer: string;
@@ -48,8 +49,7 @@ export async function SongToday(artist: string): Promise<SongData> {
 	const allSongs = sources.flatMap((source) => (songList[source] ?? []).map((song) => ({ song, source })));
 	const totalSongs: number = allSongs.length;
 
-	const now = new Date();
-	const daysSinceEpoch = Math.floor(now.getTime() / 8.64e7); // idx for today
+	const daysSinceEpoch = currentDay();
 
 	const shuffleRound = Math.floor(daysSinceEpoch / totalSongs);
 	const shuffledList = shuffleArray(allSongs, seed + shuffleRound);

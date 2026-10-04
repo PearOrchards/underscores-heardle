@@ -1,7 +1,7 @@
 import Navbar from "@/app/_components/(navbar)/navbar";
 
 import { db } from "@prisma/db";
-import { getAuth } from "@/lib/auth";
+import { getAuth } from "@/lib/who/auth-server";
 import { headers } from "next/headers";
 import { forbidden, unauthorized } from "next/navigation";
 

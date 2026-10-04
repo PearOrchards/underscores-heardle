@@ -3,7 +3,7 @@
 import { Icon } from "../ui/icon";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
-import { applicationSources, type SongSource } from "@/lib/song-sources";
+import { applicationSources, type SongSource } from "@/lib/game/song-sources";
 
 export default function SourceSelector({
   selected,

@@ -17,7 +17,7 @@ import type {
 } from '@prisma/orm-mongo/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'1cdee6109280f656ad8c4cf9d4f0277ffe7740fa60af1f98e1453db09c250f6f'>;
+  StorageHashBase<'45c64299189d18c2415db9b06e92bba13637d8336868c067e66a2845277b2fb5'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'251b3ce23f6c9f561892e7c1af9d2cc941a13d64ba1aa7226b90036b09568cc3'>;
@@ -95,6 +95,16 @@ export type FieldOutputTypes = {
       readonly songs: ArtistsSongsOutput;
       readonly createdById: CodecTypes['mongo/objectId@1']['output'] | null;
     };
+    readonly Rounds: {
+      readonly _id: CodecTypes['mongo/objectId@1']['output'];
+      readonly userId: CodecTypes['mongo/objectId@1']['output'];
+      readonly artist: CodecTypes['mongo/string@1']['output'];
+      readonly day: CodecTypes['mongo/int32@1']['output'];
+      readonly guesses: ReadonlyArray<CodecTypes['mongo/string@1']['output']>;
+      readonly status: 'PLAYING' | 'WON' | 'LOST' | 'FORFEIT';
+      readonly answer: CodecTypes['mongo/string@1']['output'] | null;
+      readonly createdAt: CodecTypes['mongo/date@1']['output'];
+    };
     readonly Session: {
       readonly _id: CodecTypes['mongo/objectId@1']['output'];
       readonly userId: CodecTypes['mongo/objectId@1']['output'];
@@ -154,6 +164,16 @@ export type FieldInputTypes = {
       readonly slug: CodecTypes['mongo/string@1']['input'];
       readonly songs: ArtistsSongsInput;
       readonly createdById: CodecTypes['mongo/objectId@1']['input'] | null;
+    };
+    readonly Rounds: {
+      readonly _id: CodecTypes['mongo/objectId@1']['input'];
+      readonly userId: CodecTypes['mongo/objectId@1']['input'];
+      readonly artist: CodecTypes['mongo/string@1']['input'];
+      readonly day: CodecTypes['mongo/int32@1']['input'];
+      readonly guesses: ReadonlyArray<CodecTypes['mongo/string@1']['input']>;
+      readonly status: 'PLAYING' | 'WON' | 'LOST' | 'FORFEIT';
+      readonly answer: CodecTypes['mongo/string@1']['input'] | null;
+      readonly createdAt: CodecTypes['mongo/date@1']['input'];
     };
     readonly Session: {
       readonly _id: CodecTypes['mongo/objectId@1']['input'];
@@ -338,6 +358,54 @@ type ContractBase = Omit<
                 readonly validationAction: 'error';
               };
             };
+            readonly rounds: {
+              readonly kind: 'mongo-collection';
+              readonly indexes: readonly [
+                {
+                  readonly kind: 'mongo-index';
+                  readonly keys: readonly [
+                    { readonly field: 'userId'; readonly direction: 1 },
+                    { readonly field: 'artist'; readonly direction: 1 },
+                    { readonly field: 'day'; readonly direction: 1 },
+                  ];
+                  readonly unique: true;
+                },
+              ];
+              readonly validator: {
+                readonly kind: 'mongo-validator';
+                readonly jsonSchema: {
+                  readonly bsonType: 'object';
+                  readonly properties: {
+                    readonly _id: { readonly bsonType: 'objectId' };
+                    readonly userId: { readonly bsonType: 'objectId' };
+                    readonly artist: { readonly bsonType: 'string' };
+                    readonly day: { readonly bsonType: 'int' };
+                    readonly guesses: {
+                      readonly bsonType: 'array';
+                      readonly items: { readonly bsonType: 'string' };
+                    };
+                    readonly status: {
+                      readonly bsonType: 'string';
+                      readonly enum: readonly ['PLAYING', 'WON', 'LOST', 'FORFEIT'];
+                    };
+                    readonly answer: { readonly bsonType: readonly ['null', 'string'] };
+                    readonly createdAt: { readonly bsonType: 'date' };
+                  };
+                  readonly additionalProperties: false;
+                  readonly required: readonly [
+                    '_id',
+                    'artist',
+                    'createdAt',
+                    'day',
+                    'guesses',
+                    'status',
+                    'userId',
+                  ];
+                };
+                readonly validationLevel: 'strict';
+                readonly validationAction: 'error';
+              };
+            };
             readonly session: {
               readonly kind: 'mongo-collection';
               readonly indexes: readonly [
@@ -455,6 +523,7 @@ type ContractBase = Omit<
       readonly model: 'Artists';
     };
     readonly admin: { readonly namespace: '__unbound__' & NamespaceId; readonly model: 'Admin' };
+    readonly rounds: { readonly namespace: '__unbound__' & NamespaceId; readonly model: 'Rounds' };
     readonly user: { readonly namespace: '__unbound__' & NamespaceId; readonly model: 'User' };
     readonly session: {
       readonly namespace: '__unbound__' & NamespaceId;
@@ -619,6 +688,57 @@ type ContractBase = Omit<
             };
             readonly storage: { readonly collection: 'artists' };
           };
+          readonly Rounds: {
+            readonly fields: {
+              readonly _id: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly userId: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/objectId@1' };
+              };
+              readonly artist: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly day: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
+              };
+              readonly guesses: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+                readonly many: true;
+              };
+              readonly status: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly answer: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly createdAt: {
+                readonly nullable: false;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/date@1' };
+              };
+            };
+            readonly relations: {
+              readonly user: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'User';
+                };
+                readonly cardinality: 'N:1';
+                readonly on: {
+                  readonly localFields: readonly ['userId'];
+                  readonly targetFields: readonly ['_id'];
+                };
+              };
+            };
+            readonly storage: { readonly collection: 'rounds' };
+          };
           readonly Session: {
             readonly fields: {
               readonly _id: {
@@ -732,6 +852,17 @@ type ContractBase = Omit<
                 readonly on: {
                   readonly localFields: readonly ['_id'];
                   readonly targetFields: readonly ['createdById'];
+                };
+              };
+              readonly gamesPlayed: {
+                readonly to: {
+                  readonly namespace: '__unbound__' & NamespaceId;
+                  readonly model: 'Rounds';
+                };
+                readonly cardinality: '1:N';
+                readonly on: {
+                  readonly localFields: readonly ['_id'];
+                  readonly targetFields: readonly ['userId'];
                 };
               };
               readonly admin: {
@@ -855,6 +986,17 @@ type ContractBase = Omit<
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/int32@1' };
               };
             };
+          };
+        };
+        readonly enum: {
+          readonly RoundStates: {
+            readonly codecId: 'mongo/string@1';
+            readonly members: readonly [
+              { readonly name: 'PLAYING'; readonly value: 'PLAYING' },
+              { readonly name: 'WON'; readonly value: 'WON' },
+              { readonly name: 'LOST'; readonly value: 'LOST' },
+              { readonly name: 'FORFEIT'; readonly value: 'FORFEIT' },
+            ];
           };
         };
       };
