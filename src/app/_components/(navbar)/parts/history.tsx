@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-
 import {
   Dialog,
   DialogTrigger,
@@ -16,22 +14,12 @@ import {
 } from "@/app/_components/ui/accordion";
 
 import { Button } from "@/app/_components/ui/button";
+import { startOfDay } from "@/lib/game/day";
+import type { HistoryEntry } from "@/lib/game/local-history";
 
-export default function History() {
-  const [history, setHistory] = useState<any>();
+const formatDay = (day: number) => startOfDay(day).toLocaleDateString(undefined, { timeZone: "UTC" });
 
-  const getHistory = () => {
-    const history = window.localStorage.getItem("history");
-    if (history) {
-      setHistory(JSON.parse(history));
-    }
-  };
-
-  useEffect(() => {
-    getHistory();
-    window.addEventListener("gameComplete", getHistory); // custom event handler. fired in game.tsx
-  }, []);
-
+export default function History({ history }: { history: HistoryEntry[] | null }) {
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -43,25 +31,23 @@ export default function History() {
       <DialogContent>
         <DialogTitle>history</DialogTitle>
         <DialogDescription>
-          {history ? (
+          {history?.length ? (
             <Accordion
               type="multiple"
               className="w-full mt-1 flex flex-col justify-center rounded-none border-4 border-[#4e4e4e]"
             >
-              {Object.entries(history)
-                .filter(([, data]: any) => data.guesses)
-                .map(([date, data]: any) => (
+              {history.map((round) => (
                   <AccordionItem
-                    value={date}
-                    key={date}
+                    value={String(round.day)}
+                    key={round.day}
                     className="nth-[2n+1]:bg-[#2a2a2a] not-last:border-b-4 border-b-[#4e4e4e]"
                   >
                     <AccordionTrigger className="px-4 hover:bg-[#333] hover:cursor-pointer">
-                      <p className="text-base flex-1 font-bold">{date}</p>
-                      <p className="text-base flex-5">{data.answer}</p>
+                      <p className="text-base flex-1 font-bold">{formatDay(round.day)}</p>
+                      <p className="text-base flex-5">{round.answer}</p>
                     </AccordionTrigger>
                     <AccordionContent className="pt-1.5">
-                      {data.guesses.map((guess: string, index: number) => (
+                      {round.guesses.map((guess, index) => (
                         <p key={index} className="ml-4 text-base">
                           <span className="font-semibold">{index + 1}. </span>
                           {guess}

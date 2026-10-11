@@ -1,10 +1,9 @@
 "use server";
-import {
-  getTodaysSongForArtist,
-  performGuess,
-  type GameState
-} from "@/lib/game/game-engine";
+import { getSongForArtistAndDay, performGuess, type GameState } from "@/lib/game/game-engine";
 import { loadGame, readHistory } from "@/lib/game/storage";
+import { importLegacyRounds } from "@/lib/game/legacy-import";
+import { getAuth } from "@/lib/who/auth-server";
+import { headers } from "next/headers";
 
 /**
  * Although artist is typed as string, a user could still send
@@ -17,11 +16,13 @@ const assertArtist = (artist: unknown): string => {
 
 async function view({ artist, day, guesses, status }: GameState) {
   const song = status !== "PLAYING"
-    ? await getTodaysSongForArtist(assertArtist(artist))
+    ? await getSongForArtistAndDay(artist, day)
     : undefined;
 
   return { artist, day, guesses, status, song };
 }
+
+export type GameView = Awaited<ReturnType<typeof view>>;
 
 export async function getTodayGame(artist: string) {
   const { state } = await loadGame(assertArtist(artist));
@@ -37,7 +38,7 @@ export async function submitGuess(artist: string, guess: string) {
   return view(next);
 }
 
-export async function skip(artist: string) {
+export async function submitSkip(artist: string) {
   const { state, save } = await loadGame(assertArtist(artist));
   const next = await performGuess(state, "");
   await save(next);
@@ -45,7 +46,7 @@ export async function skip(artist: string) {
 }
 
 /** Clarification: This is intended for when the song cannot be loaded, not giving up */
-export async function forfeit(artist: string) {
+export async function submitForfeit(artist: string) {
   const { state, save } = await loadGame(assertArtist(artist));
   if (state.status !== "PLAYING") throw new Error("Illegal move - game already completed");
 
@@ -59,4 +60,14 @@ export async function forfeit(artist: string) {
 
 export async function getHistory(artist: string) {
   return await readHistory(assertArtist(artist));
+}
+
+/**
+ * Copies pre-cloud history to the logged-in account
+ * @deprecated Only during October 2026
+ */
+export async function importLegacyHistory(entries: unknown) {
+  const session = await getAuth().api.getSession({ headers: await headers() });
+  if (!session) throw new Error("Log in to import your history");
+  return await importLegacyRounds(session.user.id, entries);
 }

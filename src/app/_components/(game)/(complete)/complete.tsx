@@ -1,10 +1,10 @@
-import type { SongData } from "@/app/_components/SongToday";
+import type { GameView } from "@/app/_actions/game";
 import { HeardleNumber } from "@/app/_components/HeardleNumber";
 import { currentDay, endOfDay } from "@/lib/game/day";
 
 import Image from "next/image"; // Try use without caching
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -33,14 +33,17 @@ const coverLink = (artist: string) => {
 };
 
 export default function Complete({
-  songData,
+  song,
   guesses,
+  status,
   artist,
 }: {
-  songData: SongData | null;
+  song: GameView["song"];
   guesses: string[];
+  status: GameView["status"];
   artist: string;
 }) {
+  const won = status === "WON";
   const [copiedSuccessfully, setCopiedSuccessfully] = useState<boolean>(false);
   const [manualCopy, setManualCopy] = useState<string>("");
   const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -53,36 +56,41 @@ export default function Complete({
   const [ts, setTS] = useState<number>(0);
   const [us, setUS] = useState<number>(0);
 
-  const tomorrow = endOfDay(currentDay());
-
   const bars = [];
   for (let i = 0; i < 6; i++) {
-    if (guesses[i] === songData?.answer) bars.push("bg-[#00aa00]");
+    if (guesses[i] === song?.answer) bars.push("bg-[#00aa00]");
     else if (guesses[i]) bars.push("bg-[#aa0000]");
     else if (guesses[i] === "") bars.push("bg-foreground-secondary");
     else bars.push("bg-background-secondary");
   }
 
-  setInterval(() => {
-    const now = new Date();
-    const diff = tomorrow.getTime() - now.getTime();
+  useEffect(() => {
+    const tomorrow = endOfDay(currentDay());
 
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    const tick = () => {
+      const diff = Math.max(0, tomorrow.getTime() - Date.now());
 
-    setTH(Math.floor(hours / 10));
-    setUH(hours % 10);
-    setTM(Math.floor(minutes / 10));
-    setUM(minutes % 10);
-    setTS(Math.floor(seconds / 10));
-    setUS(seconds % 10);
-  }, 1000);
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      setTH(Math.floor(hours / 10));
+      setUH(hours % 10);
+      setTM(Math.floor(minutes / 10));
+      setUM(minutes % 10);
+      setTS(Math.floor(seconds / 10));
+      setUS(seconds % 10);
+    };
+
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const share = async () => {
     let clipboardData = `${artist} heardle #${await HeardleNumber()}\n\n🔊`;
     for (let i = 0; i < 6; i++) {
-      if (guesses[i] === songData?.answer) clipboardData += `🟩`;
+      if (guesses[i] === song?.answer) clipboardData += `🟩`;
       else if (guesses[i]) clipboardData += `🟥`;
       else if (guesses[i] === "") clipboardData += `🟨`;
       else clipboardData += `⬛`;
@@ -125,22 +133,22 @@ export default function Complete({
           />
           <span className="my-auto mx-4 flex flex-col flex-nowrap">
             <p className="text-2xl">underscores</p>
-            <p className="text-lg">{songData?.answer}</p>
+            <p className="text-lg">{song?.answer}</p>
           </span>
         </div>
         <Link
-          href={songData?.link || ""}
+          href={song?.link || ""}
           target="_blank"
           rel="noopener noreferrer"
           className="my-auto mx-4 text-xl whitespace-nowrap flex gap-1"
         >
-          go ({songData?.source}){" "}
+          go ({song?.source}){" "}
           <Icon name="ChevronRight" className="size-6 my-auto" />
         </Link>
       </div>
       <div className="text-center">
         <h1 className="text-foreground-secondary text-4xl">
-          {completionMessages[guesses.length - 1]}
+          {won ? completionMessages[guesses.length - 1] : completionMessages[6]}
         </h1>
         <div className="flex flex-row flex-nowrap justify-center gap-0.5 m-2">
           {bars.map((colour, i) => (
@@ -148,9 +156,11 @@ export default function Complete({
           ))}
         </div>
         <p className="text-2xl mb-2">
-          {guesses.length < 7
+          {won
             ? `You guessed the song in ${guesses.length} attempt${guesses.length !== 1 ? "s" : ""}!`
-            : `You didn't guess the song this time. Better luck tomorrow!`}
+            : status === "FORFEIT"
+              ? `Since the song wouldn't load, this one doesn't count...`
+              : `You didn't guess the song this time. Better luck tomorrow!`}
         </p>
         {copiedSuccessfully && (
           <p className="text-lg text-foreground-secondary">copied!</p>

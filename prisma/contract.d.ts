@@ -17,7 +17,7 @@ import type {
 } from '@prisma/orm-mongo/contract/types';
 
 export type StorageHash =
-  StorageHashBase<'45c64299189d18c2415db9b06e92bba13637d8336868c067e66a2845277b2fb5'>;
+  StorageHashBase<'36b62ba42f6c5bc0ab1f2fe80b09e709375f652e59c85f1455830d127aba91b2'>;
 export type ExecutionHash = ExecutionHashBase<string>;
 export type ProfileHash =
   ProfileHashBase<'251b3ce23f6c9f561892e7c1af9d2cc941a13d64ba1aa7226b90036b09568cc3'>;
@@ -103,6 +103,7 @@ export type FieldOutputTypes = {
       readonly guesses: ReadonlyArray<CodecTypes['mongo/string@1']['output']>;
       readonly status: 'PLAYING' | 'WON' | 'LOST' | 'FORFEIT';
       readonly answer: CodecTypes['mongo/string@1']['output'] | null;
+      readonly legacy: CodecTypes['mongo/bool@1']['output'] | null;
       readonly createdAt: CodecTypes['mongo/date@1']['output'];
     };
     readonly Session: {
@@ -173,6 +174,7 @@ export type FieldInputTypes = {
       readonly guesses: ReadonlyArray<CodecTypes['mongo/string@1']['input']>;
       readonly status: 'PLAYING' | 'WON' | 'LOST' | 'FORFEIT';
       readonly answer: CodecTypes['mongo/string@1']['input'] | null;
+      readonly legacy: CodecTypes['mongo/bool@1']['input'] | null;
       readonly createdAt: CodecTypes['mongo/date@1']['input'];
     };
     readonly Session: {
@@ -389,6 +391,7 @@ type ContractBase = Omit<
                       readonly enum: readonly ['PLAYING', 'WON', 'LOST', 'FORFEIT'];
                     };
                     readonly answer: { readonly bsonType: readonly ['null', 'string'] };
+                    readonly legacy: { readonly bsonType: readonly ['null', 'bool'] };
                     readonly createdAt: { readonly bsonType: 'date' };
                   };
                   readonly additionalProperties: false;
@@ -718,6 +721,10 @@ type ContractBase = Omit<
               readonly answer: {
                 readonly nullable: true;
                 readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/string@1' };
+              };
+              readonly legacy: {
+                readonly nullable: true;
+                readonly type: { readonly kind: 'scalar'; readonly codecId: 'mongo/bool@1' };
               };
               readonly createdAt: {
                 readonly nullable: false;

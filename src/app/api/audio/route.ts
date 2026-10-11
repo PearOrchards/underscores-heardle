@@ -118,13 +118,12 @@ async function processAudioFile(audioFile: string, slug: string, offset?: number
 
 export async function GET(request: NextRequest) {
 	const artist = request.nextUrl.searchParams.get("artist");
-	const duration = request.nextUrl.searchParams.get("duration");
 	if (artist === null) return new Response("No artist provided!", { status: 400 });
 
   const { link, source, offset } = await getTodaysSongForArtist(artist);
   const { state: gameState } = await loadGame(artist);
-  const enforcedDuration = (gameState.status !== "PLAYING") ? Number(duration) : gameState.guesses.length ** 2;
-  
+  const enforcedDuration = gameState.status === "PLAYING" ? 2 ** gameState.guesses.length : undefined;
+
 	let audioFile = "";
 
 	switch (source) {
@@ -144,7 +143,7 @@ export async function GET(request: NextRequest) {
   }
 
 	try {
-		const finalBuffer = await processAudioFile(audioFile, artist, offset || 0, enforcedDuration));
+		const finalBuffer = await processAudioFile(audioFile, artist, offset || 0, enforcedDuration);
 		return new Response(new Uint8Array(finalBuffer), {
 			headers: {
 				"Content-Type": "audio/mpeg",

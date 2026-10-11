@@ -338,6 +338,13 @@
                   "kind": "scalar"
                 }
               },
+              "legacy": {
+                "nullable": true,
+                "type": {
+                  "codecId": "mongo/bool@1",
+                  "kind": "scalar"
+                }
+              },
               "status": {
                 "nullable": false,
                 "type": {
@@ -1071,6 +1078,12 @@
                         "bsonType": "string"
                       }
                     },
+                    "legacy": {
+                      "bsonType": [
+                        "null",
+                        "bool"
+                      ]
+                    },
                     "status": {
                       "bsonType": "string",
                       "enum": [
@@ -1278,7 +1291,7 @@
         "kind": "mongo-database"
       }
     },
-    "storageHash": "45c64299189d18c2415db9b06e92bba13637d8336868c067e66a2845277b2fb5"
+    "storageHash": "36b62ba42f6c5bc0ab1f2fe80b09e709375f652e59c85f1455830d127aba91b2"
   },
   "capabilities": {},
   "extensions": {},

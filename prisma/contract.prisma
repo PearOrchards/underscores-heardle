@@ -60,6 +60,7 @@ model Rounds {
   guesses   String[]
   status    RoundStates
   answer    String?       // Snapshot once finished - catalogue edits reshuffle past days
+  legacy    Boolean?      // Imported from pre-cloud localStorage history - unverified, keep off leaderboards
   createdAt DateTime      @db.Date
 
   @@unique([userId, artist, day])

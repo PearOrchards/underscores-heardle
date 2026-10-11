@@ -16,7 +16,7 @@ export default async function GameHome({
 
   return (
     <main className="flex flex-col justify-between min-h-screen">
-      <Navbar display={artist.displayName} createdBy={artist.createdById} />
+      <Navbar display={artist.displayName} artist={artist.slug} createdBy={artist.createdById} />
       <Game artist={artist.slug} />
     </main>
   );

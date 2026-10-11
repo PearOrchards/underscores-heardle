@@ -43,7 +43,7 @@ export async function writeUserGame(userId: string, prev: GameState, next: GameS
 
   if (prev.guesses.length === 0) {
     try {
-      await db.orm.rounds.create({ userId, artist, day, guesses, status, answer, createdAt: new Date() });
+      await db.orm.rounds.create({ userId, artist, day, guesses, status, answer, legacy: false, createdAt: new Date() });
       return true;
     } catch (err) {
       if ((err as { code?: number }).code === 11000) return false;

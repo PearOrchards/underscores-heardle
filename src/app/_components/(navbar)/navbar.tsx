@@ -6,7 +6,7 @@ import Edit from "./parts/edit";
 
 import { BackButton } from "../(other)/back";
 
-export default function Navbar({ display, createdBy, editMode = false }: { display?: string; createdBy?: string | null, editMode?: boolean }) {
+export default function Navbar({ display, artist, createdBy, editMode = false }: { display?: string; artist?: string; createdBy?: string | null, editMode?: boolean }) {
   const pageTitle = display ? `${display} heardle` : `oheardle`;
 
   return (
@@ -16,7 +16,7 @@ export default function Navbar({ display, createdBy, editMode = false }: { displ
       ): (
         <div className="flex justify-start gap-4">
           <Help />
-          <Stats />
+          <Stats artist={artist} />
         </div>
       )}
       <div className="text-center flex flex-row items-center gap-4">
