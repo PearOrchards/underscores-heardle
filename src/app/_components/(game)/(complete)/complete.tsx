@@ -2,7 +2,6 @@ import type { GameView } from "@/app/_actions/game";
 import { HeardleNumber } from "@/app/_components/HeardleNumber";
 import { currentDay, endOfDay } from "@/lib/game/day";
 
-import Image from "next/image"; // Try use without caching
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
@@ -124,7 +123,7 @@ export default function Complete({
     >
       <div className="flex flex-row justify-between w-full lg:w-2/5 p-2 bg-link">
         <div className="flex flex-row justify-start">
-          <Image
+          <img
             src={coverLink(artist)}
             width={250}
             height={250}
