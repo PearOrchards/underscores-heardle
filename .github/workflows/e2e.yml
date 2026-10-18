@@ -14,7 +14,7 @@ jobs:
           - 27017:27017
 
     env:
-      MONGO_URI: mongodb://127.0.0.1:27017/heardle
+      DATABASE_URL: mongodb://127.0.0.1:27017/heardle
       HARDLY_RANDOM_SEED: "42"
       # Hardly any of this is exercised so all are just stubs
       SOUNDCLOUD_CLIENT: ci
@@ -22,8 +22,9 @@ jobs:
       FALLBACK_CLIENT: ci
       URL: http://localhost:5000
       UNIX_TIMESTAMP_DAY_1: "0"
-      AUTH_SECRET: ci-secret
-      NEXTAUTH_URL: http://localhost:5000
+      BETTER_AUTH_URL: http://localhost:5000
+      # complains if not set correctly
+      BETTER_AUTH_SECRET: EggzVZyxp2KXQcnbxJtvBe2BFyKJJd861o2K8KDtR1ci
       GOOGLE_CLIENT_ID: ci
       GOOGLE_CLIENT_SECRET: ci
 
