@@ -17,6 +17,19 @@ const SONGS = [
 const flight = (value: unknown) =>
   `0:{"a":"$@1","f":"","q":"","i":true,"b":"development"}\n1:${JSON.stringify(value)}\n`;
 
+type Status = "PLAYING" | "WON" | "LOST" | "FORFEIT";
+
+// shaped like GameView from _actions/game.ts, once the game is over
+const view = ({ guesses, status }: { guesses: string[]; status: Status }) => ({
+  artist: ARTIST,
+  day: Math.floor(Date.now() / 8.64e7),
+  guesses: [...guesses],
+  status,
+  song: status === "PLAYING"
+    ? undefined
+    : { answer: ANSWER, link: "https://example.com/mock", source: "tracker", offset: 0 },
+});
+
 // Stub the audio pipeline for every test. Since normally the API relies on outside data,
 // those with poor internet could have flaky e2e test results.
 beforeEach(() => {
@@ -26,50 +39,61 @@ beforeEach(() => {
     fixture: "audio.mp3,null",
   });
 
-  // SongToday / SongSuggestions / IsGuessCorrect are server actions (POST with a Next-Action header)
-  // We can't match on the action id (it changes per build), so we distinguish the three by their argument shape:
-  // - SongToday(artist) -> [artist]
-  // - SongSuggestions(artist, query) -> artist first
-  // - IsGuessCorrect(guess, artist) -> artist second
-  cy.intercept({ method: "POST", url: "**/artists/**" }, (req) => {
-    let args: unknown;
-    try {
-      args = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-    } catch {
-      return; // not a server-action body — let it through
-    }
-    if (!Array.isArray(args)) return;
+  // Game actions are all Server Actions (POST + Next-Action header), so we have to figure out which
+  // by checking its action id against Next's manifest (see cypress' config)
+  cy.task<Record<string, string>>("serverActions").then((actions) => {
+    const state: { guesses: string[]; status: Status } = { guesses: [], status: "PLAYING" };
 
-    const send = (value: unknown) =>
-      req.reply({
-        statusCode: 200,
-        headers: { "content-type": "text/x-component" },
-        body: flight(value),
-      });
+    cy.intercept({ method: "POST", url: "**/artists/**" }, (req) => {
+      const id = req.headers["next-action"];
+      const action = actions[Array.isArray(id) ? id[0] : id];
+      if (!action) return; // idk let it through
 
-    if (args.length === 1 && args[0] === ARTIST) {
-      // SongToday(artist)
-      send({
-        answer: ANSWER,
-        link: "https://example.com/mock",
-        source: "tracker",
-        offset: 0,
-      });
-    } else if (args.length === 2 && args[0] === ARTIST) {
-      // SongSuggestions(artist, query)
-      const query = typeof args[1] === "string" ? args[1] : "";
-      send(
-        query === ""
-          ? SONGS
-          : SONGS.filter((s) => s.toLowerCase().includes(query.toLowerCase())),
-      );
-    } else if (args.length === 2 && args[1] === ARTIST) {
-      // IsGuessCorrect(guess, artist)
-      // "$undefined" is Flight's encoding for undefined
-      const guess = args[0] === "$undefined" ? undefined : args[0];
-      send(guess === ANSWER);
-    }
-    // Anything else: leave untouched
+      let args: unknown[];
+      try {
+        const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+        args = Array.isArray(body) ? body : [];
+      } catch {
+        args = [];
+      }
+
+      const send = (value: unknown) =>
+        req.reply({
+          statusCode: 200,
+          headers: { "content-type": "text/x-component" },
+          body: flight(value),
+        });
+
+      switch (action) {
+        case "getTodayGame":
+          return send(view(state));
+        // submitGuess(artist, guess), and a submitSkip is just an empty guess ("")
+        case "submitGuess":
+        case "submitSkip": {
+          if (state.status !== "PLAYING") return send(view(state));
+          // "$undefined" is Flight's encoding for undefined
+          const guess = action === "submitGuess" && typeof args[1] === "string" && args[1] !== "$undefined"
+            ? args[1]
+            : "";
+          state.guesses.push(guess);
+          if (guess === ANSWER) state.status = "WON";
+          else if (state.guesses.length >= 6) state.status = "LOST";
+          return send(view(state));
+        }
+        case "submitForfeit":
+          if (state.status === "PLAYING") state.status = state.guesses.length === 0 ? "FORFEIT" : "LOST";
+          return send(view(state));
+        case "getHistory":
+          return send(null); // Same as the server for a logged-out player
+        case "SongSuggestions": 
+          const query = typeof args[1] === "string" ? args[1] : "";
+          return send(
+            query === ""
+              ? SONGS
+              : SONGS.filter((s) => s.toLowerCase().includes(query.toLowerCase())),
+          );
+      }
+    });
   });
 });
 
