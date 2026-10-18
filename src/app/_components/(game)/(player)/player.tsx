@@ -100,7 +100,6 @@ export default function Player({
           if (r.ok) {
             tempOffset = parseInt(r.headers.get("X-Offset") || "0") / 1000;
             setOffset(tempOffset);
-            console.log(tempOffset);
             return r.arrayBuffer();
           } else {
             if (r.status === 408) {
