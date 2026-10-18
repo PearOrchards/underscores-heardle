@@ -1,25 +1,40 @@
 import Help from "./parts/help";
 import Stats from "./parts/stats";
 import About from "./parts/about";
+import Login from "./parts/login";
+import Edit from "./parts/edit";
 
-export default function Navbar({ display }: { display?: string }) {
+import { BackButton } from "../(other)/back";
+
+export default function Navbar({ display, artist, createdBy, editMode = false }: { display?: string; artist?: string; createdBy?: string | null, editMode?: boolean }) {
+  const pageTitle = display ? `${display} heardle` : `oheardle`;
+
   return (
     <nav className="w-full absolute top-0 left-0 grid grid-cols-[1fr_auto_1fr] items-center py-4 px-8 lg:px-[10vw] border-b border-white bg-background-secondary/50">
-      <div className="flex justify-start gap-4">
-        <About />
-      </div>
-      <div className="text-center">
+      {editMode ? (
+        <BackButton />
+      ): (
+        <div className="flex justify-start gap-4">
+          <Help />
+          <Stats artist={artist} />
+        </div>
+      )}
+      <div className="text-center flex flex-row items-center gap-4">
         <h1
           data-cy="page-title"
           className="text-3xl sm:text-4xl lg:text-6xl font-bold whitespace-nowrap"
         >
-          {display ? `${display} heardle` : `pheardle`}
+          { editMode && "editing: " }
+          { pageTitle }
         </h1>
+        {!editMode && createdBy && <Edit display={display} createdBy={createdBy} />}
       </div>
-      <div className="flex justify-end gap-4">
-        <Stats />
-        <Help />
-      </div>
+      {!editMode && (
+        <div className="flex justify-end gap-4">
+          <About />
+          <Login />
+        </div>
+      )}
     </nav>
   );
 }

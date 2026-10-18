@@ -1,0 +1,133 @@
+// use prisma-next
+type ArtistsSongs {
+  soundcloud ArtistsSongsSoundcloud[]
+  tracker    ArtistsSongsTracker[]
+  deezer     ArtistsSongsDeezer[]
+}
+
+type ArtistsSongsSoundcloud {
+  answer String
+  link   String
+  offset Int?
+}
+
+type ArtistsSongsTracker {
+  answer String
+  link   String
+  offset Int?
+}
+
+type ArtistsSongsDeezer {
+  answer String
+  link   String
+  offset Int?
+}
+
+enum RoundStates {
+  PLAYING
+  WON
+  LOST
+  FORFEIT
+}
+
+model Artists {
+  id           ObjectId     @id @default(auto()) @map("_id")
+  colour       String
+  displayName  String
+  lastAccessed DateTime     @db.Date
+  slug         String       @unique(map: "slug")
+  songs        ArtistsSongs
+  createdById  ObjectId?
+  createdBy    User?        @relation(fields:[createdById], references:[id], onDelete: SetNull)
+
+  @@map("artists")
+}
+
+model Admin {
+  id     ObjectId @id @default(auto()) @map("_id")
+  userId ObjectId @unique
+  user   User     @relation(fields:[userId], references:[id], onDelete: Cascade)
+
+  @@map("admin")
+}
+
+model Rounds {
+  id        ObjectId      @id @default(auto()) @map("_id")
+  userId    ObjectId
+  user      User          @relation(fields:[userId], references:[id], onDelete: Cascade)
+  artist    String
+  day       Int
+  guesses   String[]
+  status    RoundStates
+  answer    String?       // Snapshot once finished - catalogue edits reshuffle past days
+  legacy    Boolean?      // Imported from pre-cloud localStorage history - unverified, keep off leaderboards
+  createdAt DateTime      @db.Date
+
+  @@unique([userId, artist, day])
+  @@map("rounds")
+}
+
+// --- BetterAuth ---
+// Written only by Better Auth (src/lib/auth.ts); read-only from Prisma.
+// Fields mirror @better-auth/core getAuthTables() v1.7.x.
+model User {
+  id             ObjectId  @id @default(auto()) @map("_id")
+  name           String
+  email          String    @unique
+  emailVerified  Boolean   @default(false)
+  image          String?
+  createdAt      DateTime  @db.Date
+  updatedAt      DateTime  @db.Date
+  sessions       Session[]
+  accounts       Account[]
+  artistsCreated Artists[]
+  gamesPlayed    Rounds[]
+  admin          Admin?
+
+  @@map("user")
+}
+
+model Session {
+  id        ObjectId @id @default(auto()) @map("_id")
+  userId    ObjectId
+  user      User     @relation(fields:[userId], references:[id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime @db.Date
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @db.Date
+  updatedAt DateTime @db.Date
+
+  @@map("session")
+}
+
+model Account {
+  id                    ObjectId  @id @default(auto()) @map("_id")
+  userId                ObjectId
+  user                  User      @relation(fields:[userId], references:[id], onDelete: Cascade)
+  accountId             String
+  providerId            String
+  issuer                String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime? @db.Date
+  refreshTokenExpiresAt DateTime? @db.Date
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @db.Date
+  updatedAt             DateTime  @db.Date
+
+  @@map("account")
+}
+
+model Verification {
+  id         ObjectId @id @default(auto()) @map("_id")
+  identifier String
+  value      String
+  expiresAt  DateTime @db.Date
+  createdAt  DateTime @db.Date
+  updatedAt  DateTime @db.Date
+
+  @@map("verification")
+}

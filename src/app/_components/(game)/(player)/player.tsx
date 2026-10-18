@@ -8,15 +8,11 @@ import {
 } from "@/app/_components/ui/dialog";
 import { Icon } from "@/app/_components/ui/icon";
 import { cn } from "@/lib/utils";
-import { SongToday } from "@/app/_components/SongToday";
 
-const audioLink = (artist: string, duration?: number) => {
+const audioLink = (artist: string) => {
   const now = new Date();
   const str = now.toISOString().split("T")[0];
-  return (
-    `/api/audio?t=${str}&artist=${artist}` +
-    (duration ? `&duration=${duration}` : "")
-  );
+  return `/api/audio?t=${str}&artist=${artist}`;
 };
 
 export default function Player({
@@ -24,11 +20,13 @@ export default function Player({
   complete,
   doNotAutoplay,
   artist,
+  forfeit,
 }: {
   currentAttempt: number;
   complete: boolean;
   doNotAutoplay: boolean;
   artist: string;
+  forfeit: () => Promise<string>;
 }) {
   // Player functionality states
   const [ready, setReady] = useState<boolean>(false);
@@ -42,7 +40,10 @@ export default function Player({
 
   // Modal states (for errors)
   const [modalOpen, setModalOpen] = useState<boolean>(false);
-  const openErrorModal = () => setModalOpen(true);
+  const openErrorModal = async () => {
+    setModalOpen(true);
+    if (!song) setSong(await forfeit());
+  };
   const closeErrorModal = () => setModalOpen(false);
   const [song, setSong] = useState<string>(""); // ONLY TO BE SET WHEN AN ERROR OCCURS
 
@@ -94,30 +95,23 @@ export default function Player({
         wasPlayingOnAudioUpdate = true;
       }
 
-      const link =
-        currentAttempt <= 6
-          ? audioLink(artist, Math.pow(2, currentAttempt))
-          : audioLink(artist);
-      fetch(link)
+      fetch(audioLink(artist), { cache: "no-store" })
         .then((r) => {
           if (r.ok) {
             tempOffset = parseInt(r.headers.get("X-Offset") || "0") / 1000;
             setOffset(tempOffset);
-            console.log(tempOffset);
             return r.arrayBuffer();
           } else {
             if (r.status === 408) {
               setError(
                 "Hang on! We can't connect to the API. You can either try again later or click this box to get the answer.",
               );
-              SongToday(artist).then((s) => setSong(s.answer));
             } else if (r.status === 418) {
               setError("AH!!! You cut us off! Please reload and be patient!");
             } else {
               setError(
                 "Something went wrong... Please try again (later) or click this box to get the answer.",
               );
-              SongToday(artist).then((s) => setSong(s.answer));
             }
             return null;
           }
@@ -139,7 +133,7 @@ export default function Player({
         setDisplayedTime(Math.floor(audioRef.current?.currentTime || 0));
       });
     }
-  }, [artist, currentAttempt]);
+  }, [artist, currentAttempt, complete]);
 
   useEffect(() => {
     if (complete && audioRef.current && !doNotAutoplay) {
@@ -243,7 +237,7 @@ export default function Player({
             <DialogDescription>
               Since something has gone wrong, and it could be any host of
               issues, we&apos;ll just give you the answer :) <br />
-              It&apos;s &quot;{song}&quot;
+              {song ? <>It&apos;s &quot;{song}&quot;</> : "Fetching it..."}
             </DialogDescription>
           </DialogContent>
         </Dialog>

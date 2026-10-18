@@ -3,7 +3,7 @@ name: Build
 on:
   pull_request:
 
-# Builds the production Docker image (no push) so PRs catch build breakages 
+# Builds the production Docker image (no push) so PRs catch build breakages
 # against the exact artifact that ships.
 jobs:
   build:
@@ -20,5 +20,6 @@ jobs:
           push: false
           build-args: |
             URL=http://localhost:5000
+            DATABASE_URL=mongodb://127.0.0.1:27017/heardle
           cache-from: type=gha
           cache-to: type=gha,mode=max

@@ -4,106 +4,83 @@ import { useState, useEffect } from "react";
 import AttemptBox from "./(attemptBox)/attemptBox";
 import Player from "@/app/_components/(game)/(player)/player";
 import Input from "@/app/_components/(game)/(input)/input";
-
-import {
-  IsGuessCorrect,
-  SongToday,
-  type SongData,
-} from "@/app/_components/SongToday";
 import Complete from "@/app/_components/(game)/(complete)/complete";
 
-export type History = {
-  [date: string]: {
-    guesses?: string[];
-    answer?: string;
-  };
-};
-
-const dateToday = () => {
-  const today = new Date();
-  return (
-    today.getDate() + "/" + (today.getMonth() + 1) + "/" + today.getFullYear()
-  );
-};
+import {
+  getTodayGame,
+  submitGuess,
+  submitSkip,
+  submitForfeit,
+} from "@/app/_actions/game";
+import { authClient } from "@/lib/who/auth-client";
+import { saveLocalHistory } from "@/lib/game/local-history";
+import type { GameView } from "@/app/_actions/game";
 
 export default function Game({ artist }: { artist: string }) {
-  const [guesses, setGuesses] = useState<string[]>([]);
-  const [complete, setComplete] = useState<boolean>(false);
-  const [songData, setSongData] = useState<SongData | null>(null);
+  const [game, setGame] = useState<GameView | null>(null);
   const [doNotAutoplay, setDoNotAutoplay] = useState<boolean>(false);
+
+  const { data: session, isPending } = authClient.useSession();
 
   useEffect(() => {
     console.log(`hello! now loading up ${artist}'s heardle`);
 
-    let history = window.localStorage.getItem("history");
-    if (!history) {
-      const newHistory: any = {};
-      window.localStorage.setItem("history", JSON.stringify(newHistory));
-      history = window.localStorage.getItem("history");
-    }
-
-    const parsedHistory = JSON.parse(history!) as History;
-
-    if (!parsedHistory[dateToday()]) {
-      parsedHistory[dateToday()] = {};
-      window.localStorage.setItem("history", JSON.stringify(parsedHistory));
-      setGuesses([]);
-    } else {
-      const today = parsedHistory[dateToday()];
-      setGuesses(today.guesses || []); // Filter out any non-string values (empty arrays from migration)
-      if (today.answer && today.answer !== "") {
-        setDoNotAutoplay(true); // gameComplete(); isn't needed, guesses useEffect triggers it anyway.
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    IsGuessCorrect(guesses[guesses.length - 1], artist).then(async (result) => {
-      if (result || guesses.length > 6) await gameComplete();
-      else if (guesses.length == 6) {
-        updateGuesses("");
-      } // Add a blank guess to signify the end of the game.
+    getTodayGame(artist).then((view) => {
+      if (view.status !== "PLAYING") setDoNotAutoplay(true); // Already done, autoplay won't work
+      setGame(view);
     });
-  }, [guesses]);
+  }, [artist]);
 
-  const guess = async (g: string) => {
-    updateGuesses(g);
-  };
+  const apply = (view: GameView) => {
+    setGame(view);
+    if (view.status === "PLAYING") return;
 
-  const skip = async () => {
-    updateGuesses("");
-  };
+    // Logged-in players' history is on the server; everyone else's lives in this browser.
+    if (!isPending && !session) {
+      saveLocalHistory({
+        artist: view.artist,
+        day: view.day,
+        guesses: view.guesses,
+        status: view.status,
+        answer: view.song?.answer ?? null,
+      });
+    }
 
-  const updateGuesses = (g: string) => {
-    const newGuesses = [...guesses, g];
-    setGuesses(newGuesses);
-
-    const history = window.localStorage.getItem("history");
-    const parsed = JSON.parse(history!) as History;
-    parsed[dateToday()].guesses = newGuesses;
-
-    window.localStorage.setItem("history", JSON.stringify(parsed));
-  };
-
-  const gameComplete = async () => {
-    const songData = await SongToday(artist);
-
-    const history = window.localStorage.getItem("history");
-    const parsed = JSON.parse(history!) as History;
-    parsed[dateToday()].answer = songData.answer;
-    window.localStorage.setItem("history", JSON.stringify(parsed));
-
-    // firing custom event (received in stats.tsx)
+    // firing custom event (received in useHistory)
     window.dispatchEvent(new Event("gameComplete"));
-
-    setSongData(songData);
-    setComplete(true);
   };
+
+  const move = async (action: () => Promise<GameView>) => {
+    try {
+      apply(await action());
+    } catch {
+      // Failed, so try reloading
+      setGame(await getTodayGame(artist));
+    }
+  };
+
+  const guess = (g: string) => move(() => submitGuess(artist, g));
+  const skip = () => move(() => submitSkip(artist));
+
+  const forfeit = async () => {
+    if (game?.song) return game.song.answer;
+
+    let answer = "";
+    await move(async () => {
+      const view = await submitForfeit(artist);
+      answer = view.song?.answer ?? "";
+      return view;
+    });
+    return answer;
+  };
+
+  const guesses = game?.guesses ?? [];
+  const complete = game !== null && game.status !== "PLAYING";
 
   return (
     <>
       {complete ? (
-        <Complete songData={songData} guesses={guesses} artist={artist} />
+        <Complete song={game.song} guesses={guesses} status={game.status} artist={artist} />
       ) : (
         <section className="mt-24" id="attemptBoxes">
           {[0, 1, 2, 3, 4, 5].map((i) => {
@@ -117,21 +94,24 @@ export default function Game({ artist }: { artist: string }) {
           })}
         </section>
       )}
-      <div className="w-full absolute bottom-0 bg-background-secondary/50">
-        <Player
-          currentAttempt={guesses.length}
-          complete={complete}
-          doNotAutoplay={doNotAutoplay}
-          artist={artist}
-        />
-        <Input
-          currentAttempt={guesses.length}
-          complete={complete}
-          guess={guess}
-          skip={skip}
-          artist={artist}
-        />
-      </div>
+      {game && (
+        <div className="w-full absolute bottom-0 bg-background-secondary/50">
+          <Player
+            currentAttempt={guesses.length}
+            complete={complete}
+            doNotAutoplay={doNotAutoplay}
+            artist={artist}
+            forfeit={forfeit}
+          />
+          <Input
+            currentAttempt={guesses.length}
+            complete={complete}
+            guess={guess}
+            skip={skip}
+            artist={artist}
+          />
+        </div>
+      )}
     </>
   );
 }

@@ -1,8 +1,10 @@
-import { SongToday } from "@/app/_components/SongToday";
 import { type NextRequest } from "next/server";
 import path from "node:path";
 import { readFileSync } from "node:fs";
 import Soundcloud from "soundcloud.ts";
+
+import { getTodaysSongForArtist } from "@/lib/game/game-engine";
+import { loadGame } from "@/lib/game/storage";
 
 async function getSoundcloudCoverTS(url: string): Promise<string> {
 	const sc = new Soundcloud();
@@ -28,7 +30,9 @@ export async function GET(req: NextRequest) {
 	const artist = req.nextUrl.searchParams.get("artist");
 	if (artist === null) return new Response("No artist provided!", { status: 400 });
 
-	const { link, source } = await SongToday(artist);
+  const { link, source } = await getTodaysSongForArtist(artist);
+  const { state: gameState } = await loadGame(artist);
+  if (gameState.status === "PLAYING") return new Response("Not yet!", { status: 403 });
 
 	let cover;
 	switch (source) {

@@ -1,0 +1,22 @@
+name: Contract
+
+on:
+  pull_request:
+
+# contract.json is loaded at runtime, so we emit it again to ensure it's up to date
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Check emitted artifacts are up to date
+        run: |
+          pnpm contract:emit
+          git diff --exit-code prisma/contract.json prisma/contract.d.ts
