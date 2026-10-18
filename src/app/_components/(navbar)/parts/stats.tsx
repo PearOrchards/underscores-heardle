@@ -99,7 +99,7 @@ export default function Stats({ artist }: { artist?: string }) {
           </div>
           <div className="text-center flex flex-row flex-wrap justify-center gap-4">
             {!stats ? (
-              <p>sorry! nothing here!</p>
+              <p>sorry! nothing here! are you logged in?</p>
             ) : (
               Object.keys(StatsKeyDescriptions)
                 .filter((key: string) => key != "distribution")
