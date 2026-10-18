@@ -20,6 +20,6 @@ jobs:
           push: false
           build-args: |
             URL=http://localhost:5000
-            DATABASE_URL: mongodb://127.0.0.1:27017/heardle
+            DATABASE_URL=mongodb://127.0.0.1:27017/heardle
           cache-from: type=gha
           cache-to: type=gha,mode=max
