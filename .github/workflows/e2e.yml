@@ -51,7 +51,7 @@ jobs:
           start: pnpm dev
           # Wait on the real page (not "/", which 307-redirects) so the dev server
           # has compiled the route and connected to Mongo before tests start.
-          wait-on: http://localhost:5000/artists/underscores
+          wait-on: http://127.0.0.1:5000/artists/underscores
           wait-on-timeout: 120
           browser: electron
           spec: cypress/e2e/app.cy.ts
